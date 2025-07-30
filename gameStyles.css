@@ -1,0 +1,53 @@
+body {
+    background-color: floralwhite;
+    font-family: Tahoma;
+}
+
+._column {
+    float: left;
+    margin: 5px;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+#_searchColumn {
+    width: 20%;
+}
+
+#_gamesColumn {
+    width: 75%;
+}
+
+._searchCategory {
+    border: 1px solid black;
+    margin-bottom: 5px;
+    min-width: 200px;
+}
+
+._searchCategoryName {
+    background-color: lightsteelblue;
+    padding: 5px;
+}
+
+._searchCategoryContents {
+    padding: 5px;
+}
+
+._listedGame {
+    margin-bottom: 5px;
+    background-color: lightsteelblue;
+}
+
+._gameTitle {
+    padding: 5px;
+}
+
+._gameInfo {
+    padding: 5px;
+    padding-top: 0px;
+}
+
