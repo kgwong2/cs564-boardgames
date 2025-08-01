@@ -261,31 +261,33 @@ class BTree {
         }
     }
 
+    /**
+     * Deletes the given studentId from the BTree and the student.csv.
+     * 
+     * @param studentId- The studentId to search for and delete.
+     * @return True if student was deleted. False otherwise.
+     */
     boolean delete(long studentId) {
-      /**
-       * TODO: Implement this function to delete in the B+Tree. Also, delete in
-       * student.csv after deleting in B+Tree, if it exists. Return true if the
-       * student is deleted successfully otherwise, return false.
-       */
-      
       // Check if the BTree is empty.
       if (this.root == null) {
         return false;
       }
-      
-      // Search for Node
-      boolean isDeleted = deleteHelper(null, -1, this.root, studentId);
-      
+
+      // Run deleteHelper to delete from BTree.
+      boolean isDeleted =
+          deleteHelper(null, this.root, studentId, new LongRef(-1));
+
       // If deletion succeeds, delete in student.csv.
       if (isDeleted) {
         try {
           String newFileName = "StudentCopy.csv";
-          BufferedReader reader = new BufferedReader(new FileReader("Student.csv"));
+          BufferedReader reader =
+              new BufferedReader(new FileReader("Student.csv"));
           FileWriter writer = new FileWriter(newFileName);
-                     
+
           String line = reader.readLine();
           String splitBy = ",";
-          
+
           while (line != null) {
             String[] studentData = line.split(splitBy);
             long csvstudentId = Long.parseLong(studentData[0]);
@@ -295,294 +297,402 @@ class BTree {
             }
             line = reader.readLine();
           } // while
-          
+
           reader.close();
           writer.close();
-          
-        }
-        catch (IOException e) {
+
+        } catch (IOException e) {
           System.out.println("Error updating student.csv.");
         }
       }
-      
+
       return isDeleted;
     }
-    
-    // TODO: implement
-    // noddPos == the index in the parent's children array
-    private boolean deleteHelper(BTreeNode parent, int nodePos, BTreeNode node, long studentId) {
-      
-      // If not leaf node
-      if (!node.leaf) {
-        // Search through all keys in node
-        for (int i = 0; i < node.n; i++) {
-          
-          // If studentId is found, delete
-          if (studentId == node.keys[i]) {
-            
-            // Find in order predecessor
-            BTreeNode predParent = findPredecessorParent(node, i);
-            BTreeNode predNode = predParent.children[predParent.n];
-            long predId = predNode.keys[predNode.n - 1];
-            
-            // Update non-leaf node to in order predecessor
-            node.keys[i] = predNode.keys[predNode.n - 1];
-            node.values[i] = predNode.values[predNode.n - 1];
-            
-            // Delete key and value from leaf
-            deleteHelper(predParent, predParent.n, predNode, predId);
-          }
-          // If studentId is less than key, check left child
-          if (studentId < node.keys[i]) {
-            deleteHelper(node, i, node.children[i], studentId);
-          }
-          // If studentId is greater than key, child right child
-          if (studentId > node.keys[i] && i == node.n - 1) {
-            deleteHelper(node, i + 1, node.children[i + 1], studentId);
-          }
-        } // for
-      }
-      // If leaf node
-      else {
-        // Search through all keys in node
-        for (int i = 0; i < node.n; i++) {
-          // If studentId is found, delete
-          if (studentId == node.keys[i]) {
-            
-            // Node has minimum number of keys and is not the root
-            if (node.n == node.t && parent != null) {
-              int siblingPos = findSibling(parent, nodePos);
-              
-              // Merge if no extra entries (or siblings)
-              if (siblingPos == -1) {
-                
-                // Remove studentId from node.
-                shiftRight(node, i);
-                // Merge nodes.
-                mergeHelper(parent, nodePos);
-                
-              }
-              // Pull from left sibling (rotate right)
-              else if (siblingPos < nodePos) {
-                shiftRight(node, i);
-                rotateRight(parent, i, siblingPos);
-              }
-              // Pull from right sibling (rotate left)
-              else {
-                shiftLeft(node, i);
-                rotateLeft(parent, i, siblingPos);
-              }
-            } // if
-            // Node has keys to spare or is the root (only node in tree)
-            else {
-              shiftLeft(node, i);
-              node.n--;
-            }
 
+    /**
+     * Recursive helper method to delete studentId from the B-Tree. Student
+     * deletion works only if the studentID is in a leaf node.
+     * 
+     * @param parent       - The parent node.
+     * @param node         - The current node that is being checked.
+     * @param studentId    - The studentId to search for and delete.
+     * @param oldStudentId - The studentId to delete from the parent, if a child
+     *                     is deleted because of a merge.
+     * @return True if a studentId is found and deleted. False otherwise.
+     */
+    private boolean deleteHelper(BTreeNode parent, BTreeNode node, long studentId,
+        LongRef oldStudentId) {
+
+      // If node is non-leaf,
+      if (!node.leaf) {
+
+        int j = findChildIndex(node, studentId);
+        boolean isDeleted =
+            deleteHelper(node, node.children[j], studentId, oldStudentId);
+
+        // If nothing was deleted,
+        if (!isDeleted) {
+          return isDeleted;
+        }
+
+        // If child was not deleted,
+        if (oldStudentId.value == -1) {
+          return isDeleted;
+        }
+        // If child was deleted from merge, check minimum degree.
+        else {
+          int i = findKeysIndex(node, oldStudentId.value);
+
+          // Node has entries to spare OR the node is the root
+          if (node.n > node.t || parent == null) {
+            shiftLeft(node, i);
+            shiftChildrenLeft(node, i + 1);
+            node.n--;
+            oldStudentId.value = -1;
+            return isDeleted;
+          }
+          // Node doesn't have entries to spare
+          else {
+            // Find indices in the parent's children array
+            int nodeIndex = findChildIndex(parent, oldStudentId.value);
+            int siblingIndex = findSiblingIndex(parent, nodeIndex);
+
+            // Redistribute between node and sibling
+            if (siblingIndex != -1) {
+              redistribute(parent, nodeIndex, siblingIndex, i);
+              oldStudentId.value = -1;
+              return isDeleted;
+            }
+            // Merge node and sibling
+            else {
+              // Set oldStudentId for recursive removal and check.
+              oldStudentId.value = parent.keys[nodeIndex];
+              shiftRight(node, i);
+              merge(parent, nodeIndex);
+              return isDeleted;
+            }
+          } // else node has no entries to spare
+        } // else child was deleted from merge
+      }
+      // If node is leaf,
+      else {
+        int i = findKeysIndex(node, studentId); // Find studentId keys index.
+
+        // If index is same as length of keys array, studentId was not found.
+        if (i == node.keys.length) {
+          return false;
+        }
+        // Otherwise, studentId was found.
+        else {
+          // Node has entries to spare OR the root is a leaf
+          if (node.n > node.t || parent == null) {
+            shiftLeft(node, i);
+            node.n--;
+            oldStudentId.value = -1;
             return true;
-          } // if
-        } // for
-        
-        // If studentId is not found,
-        return false;
-      }
-      
-      return false;
+          }
+          // Node doesn't have entries to spare.
+          else {
+            // Find indices in the parent's children array
+            int nodeIndex = findChildIndex(parent, studentId);
+            int siblingIndex = findSiblingIndex(parent, nodeIndex);
+
+            // Redistribute between node and sibling
+            if (siblingIndex != -1) {
+              redistribute(parent, nodeIndex, siblingIndex, i);
+              oldStudentId.value = -1;
+              return true;
+            }
+            // Merge node and sibling
+            else {
+              // Set oldStudentId for recursive removal and check.
+              oldStudentId.value = parent.keys[nodeIndex];
+              shiftRight(node, i);
+              merge(parent, nodeIndex);
+              return true;
+            } // else merge
+          } // else node has no entries to spare
+        } // else studentId found
+      } // else node is leaf
     }
-    
+
     /**
-     * Finds the predecessor's parent node.
-     * @param node - The node with the key/value in which a predecessor is needed
-     * @param nodePos - The key/value index of the node
-     * @return The predecessor's parent node.
+     * Wrapper class to store oldStudentId.
      */
-    private BTreeNode findPredecessorParent(BTreeNode node, int nodePos) {
-      
-      BTreeNode parent = node;
-      BTreeNode curNode = node.children[nodePos];
-      
-      while (!curNode.leaf) {
-        parent = curNode;
-        curNode = curNode.children[curNode.n];
+    private static class LongRef {
+      long value;
+
+      // Constructor
+      LongRef(long value) {
+        this.value = value;
       }
-      
-      return parent;
     }
-    
+
     /**
-     * Delete helper method to find which sibling the child should pull key values from. 
-     * @param parent - Parent node
-     * @param nodePos - Node's position in the array
-     * @return The sibling's position in the array. If neither sibling can be used, returns -1.
+     * Finds the node's children array index for a given studentId.
+     * 
+     * @param node      - The node to search the children array index
+     * @param studentId - The studentId
+     * @return The index in the children array
      */
-    private int findSibling(BTreeNode parent, int nodePos) {
+    private int findChildIndex(BTreeNode node, long studentId) {
+      int i = 0;
+      while (i < node.n) {
+        // Return when studentId is less than the comparisonId
+        if (studentId < node.keys[i]) {
+          return i;
+        }
+        i++;
+      }
+      return i;
+    }
+
+    /**
+     * Finds the node's keys array index for a given studentId.
+     * 
+     * @param node      - The node to search the keys array
+     * @param studentId - The studentId
+     * @return The index in the keys (and values) array
+     */
+    private int findKeysIndex(BTreeNode node, long studentId) {
+      int i = 0;
+      while (i < node.n) {
+        // Return when studentId is equal to the comparisonId
+        if (studentId == node.keys[i]) {
+          return i;
+        }
+        i++;
+      }
+      return i;
+    }
+
+    /**
+     * Delete helper method to find the index of the sibling the node will pull
+     * key values from, when the node has minimum number of keys. If neither
+     * sibling can be used, returns -1.
+     * 
+     * @param parent    - Parent node
+     * @param nodeIndex - Node's index in the parent's children array
+     * @return The sibling's index in the children array. If neither sibling can
+     *         be used, returns -1.
+     */
+    private int findSiblingIndex(BTreeNode parent, int nodeIndex) {
       // Fields
-      int leftSibPos = nodePos - 1;
-      int rightSibPos = nodePos + 1;
+      int leftIndex = nodeIndex - 1;
+      int rightIndex = nodeIndex + 1;
       BTreeNode leftSibling = null;
       BTreeNode rightSibling = null;
       boolean useLeft = false;
       boolean useRight = false;
-      
-      // Check if there is a left sibling.
-      if (nodePos > 0) {
-        leftSibling = parent.children[leftSibPos];
-        // Check if left sibling has enough keys to spare.
+
+      // If left sibling exists,
+      if (nodeIndex > 0) {
+        leftSibling = parent.children[leftIndex];
+        // Check if left sibling has keys to spare.
         if (leftSibling.n > leftSibling.t) {
           useLeft = true;
         }
       }
-      
-      // Check if there is a right sibling.
-      if (nodePos < parent.n) {
-        rightSibling = parent.children[rightSibPos];
-        // Check if right sibling has enough keys to spare.
+
+      // If right sibling exists,
+      if (nodeIndex < parent.n) {
+        rightSibling = parent.children[rightIndex];
+        // Check if right sibling has keys to spare.
         if (rightSibling.n > rightSibling.t) {
           useRight = true;
         }
       }
-      
-      // If both siblings have enough keys, pick the one with more keys.
+
+      // If both siblings have keys to spare, pick the one with more keys.
       if (useLeft && useRight) {
         if (leftSibling.n >= rightSibling.n) {
-          return leftSibPos;
-        }
-        else {
-          return rightSibPos;
+          return leftIndex;
+        } else {
+          return rightIndex;
         }
       }
       // If only left can be used.
       if (useLeft) {
-        return leftSibPos;
+        return leftIndex;
       }
       // If only right can be used.
       if (useRight) {
-        return rightSibPos;
+        return rightIndex;
       }
       // Neither sibling can be used.
       return -1;
     }
-    
+
     /**
-     * Merge nodes.
-     * @param parent - Parent node
-     * @param nodePos - Node's position in the array
+     * Redistributes keys and values between a node and its sibling by rotating
+     * values through the parent.
+     * 
+     * @param parent       - The parent node
+     * @param nodeIndex    - The index of the node in the parent's children array
+     * @param sibIndex     - The index of the sibling in the parent's children
+     *                     array
+     * @param studentIndex - The index of the studentId in the node's keys array
      */
-    private void mergeHelper(BTreeNode parent, int nodePos) {
-      BTreeNode node = parent.children[nodePos];
-      
-      // Merge with right sibling
-      if (nodePos != parent.n) {
-        int parentPos = nodePos;
-        BTreeNode rightSib = parent.children[nodePos + 1];
-        
+    private void redistribute(BTreeNode parent, int nodeIndex, int sibIndex,
+        int studentIndex) {
+      BTreeNode node = parent.children[nodeIndex];
+
+      // Pull from left sibling (rotate right)
+      if (sibIndex < nodeIndex) {
+        shiftRight(node, studentIndex); // Remove studentId
+        if (!node.leaf) {
+          shiftChildrenRight(node, studentIndex);
+        }
+        rotateRight(parent, studentIndex, sibIndex);
+      }
+      // Pull from right sibling (rotate left)
+      else {
+        shiftLeft(node, studentIndex); // Remove studentId
+        if (!node.leaf) {
+          shiftChildrenLeft(node, studentIndex + 1);
+        }
+        rotateLeft(parent, studentIndex, sibIndex);
+      }
+    }
+
+    /**
+     * Merges two nodes. This method always merges with the right sibling, unless
+     * the node has no right sibling (that is, it is the last node in the children
+     * array).
+     * 
+     * @param parent    - The parent node
+     * @param nodeIndex - The index of the node in the parent's children array
+     */
+    private void merge(BTreeNode parent, int nodeIndex) {
+      BTreeNode node = parent.children[nodeIndex];
+
+      // Merge with right sibling, unless node has no right sibling.
+      if (nodeIndex != parent.n) {
+        int parentIndex = nodeIndex;
+        BTreeNode rightSib = parent.children[nodeIndex + 1];
+
         // Update keys and values in node.
-        // Pull from parent.
-        node.keys[node.n - 1] = parent.keys[parentPos];
-        node.values[node.n - 1] = parent.values[parentPos];
-        // Pull from sibling.
-        int j = 0;
+        // Node <-- parent
+        node.keys[node.n - 1] = parent.keys[parentIndex];
+        node.values[node.n - 1] = parent.values[parentIndex];
+        // Node <-- sibling
+        int j = 0; // Sibling keys and values index
         for (int i = node.n; i < node.keys.length; i++) {
           node.keys[i] = rightSib.keys[j];
           node.values[i] = rightSib.values[j];
           node.n++;
           j++;
+          // Exit the loop after all sibling keys and values have been moved.
           if (j == rightSib.n) {
             break;
           }
         } // for
-        
-        // Update parent and pointers.
-        shiftLeft(parent, parentPos);
-        shiftChildrenLeft(parent, nodePos + 1);
-        parent.n--;
-        
-        // TODO validate parent
+
+        // Update sibling pointer.
+        if (node.leaf && rightSib.next != null) {
+          node.next = rightSib.next;
+        }
       }
       // Merge with left sibling
       else {
-        int parentPos = nodePos - 1;
-        BTreeNode leftSib = parent.children[nodePos - 1];
-        
+        int parentPos = nodeIndex - 1;
+        BTreeNode leftSib = parent.children[nodeIndex - 1];
+
         // Update keys and values in sibling.
-        // Pull from parent.
+        // Sibling <-- parent
         leftSib.keys[leftSib.n] = parent.keys[parentPos];
         leftSib.values[leftSib.n] = parent.values[parentPos];
         leftSib.n++;
-        // Pull from node.
-        int j = 0;
+        // Sibling <-- node
+        int j = 0; // Node keys and values index
         for (int i = leftSib.n; i < leftSib.keys.length; i++) {
           leftSib.keys[i] = node.keys[j];
           leftSib.values[i] = node.values[j];
           leftSib.n++;
           j++;
+          // Exit the loop after all node keys and values have been moved.
           if (j == node.n - 1) {
             break;
           }
         } // for
-        
-        // Update parent and pointers.
-        shiftLeft(parent, parentPos);
-        shiftChildrenLeft(parent, nodePos + 1);
-        parent.n--;
-        
-        // TODO validate parent
+
+        // Update sibling pointer.
+        if (leftSib.leaf) {
+          leftSib.next = null;
+        }
       }
     }
-    
+
     /**
-     * Rotates values right (clockwise).
-     * @param parent - Parent node
-     * @param nodePos - For the node to rotate values to, its position in the children array
-     * @param sibPos - For the node to rotate values from, its position in the children array
+     * Rotates values right (clockwise). That is, the left sibling distributes
+     * values to the node through their shared parent.
+     * 
+     * @param parent    - The parent node
+     * @param nodeIndex - The index of the node in the parent's children array
+     * @param sibIndex  - The index of the left sibling in the parent's children
+     *                  array
      */
-    private void rotateRight(BTreeNode parent, int nodePos, int sibPos) {
-      int parentPos = nodePos - 1;
-      BTreeNode node = parent.children[nodePos];
-      BTreeNode leftSibling = parent.children[sibPos];
-      
+    private void rotateRight(BTreeNode parent, int nodeIndex, int sibIndex) {
+      int parentPos = nodeIndex - 1;
+      BTreeNode node = parent.children[nodeIndex];
+      BTreeNode leftSibling = parent.children[sibIndex];
+
       // Update node.
       node.keys[0] = parent.keys[parentPos];
       node.values[0] = parent.values[parentPos];
-      
+      if (!node.leaf) {
+        node.children[0] = leftSibling.children[leftSibling.n];
+      }
+
       // Update parent.
       parent.keys[parentPos] = leftSibling.keys[leftSibling.n - 1];
       parent.values[parentPos] = leftSibling.values[leftSibling.n - 1];
-      
+
       // Update sibling.
       leftSibling.keys[leftSibling.n - 1] = 0L;
       leftSibling.values[leftSibling.n - 1] = 0L;
       leftSibling.n--;
     }
-    
+
     /**
-     * Rotates values left (counter-clockwise).
-     * @param parent - Parent node
-     * @param nodePos - For the node to rotate values to, its position in the children array
-     * @param sibPos - For the node to rotate values from, its position in the children array
+     * Rotates values left (counter-clockwise). That is, the right sibling
+     * distributes values to the node through their shared parent.
+     * 
+     * @param parent    - Parent node
+     * @param nodeIndex - The index of the node in the parent's children array
+     * @param sibIndex  - The index of the right sibling in the parent's children
+     *                  array
      */
-    private void rotateLeft(BTreeNode parent, int nodePos, int sibPos) {
-      int parentPos = nodePos;
-      BTreeNode node = parent.children[nodePos];
-      BTreeNode rightSibling = parent.children[sibPos];
-      
+    private void rotateLeft(BTreeNode parent, int nodeIndex, int sibIndex) {
+      int parentPos = nodeIndex;
+      BTreeNode node = parent.children[nodeIndex];
+      BTreeNode rightSibling = parent.children[sibIndex];
+
       // Update node.
       node.keys[node.n - 1] = parent.keys[parentPos];
       node.values[node.n - 1] = parent.values[parentPos];
-      
+      if (!node.leaf) {
+        node.children[node.n] = rightSibling.children[0];
+      }
+
       // Update parent.
       parent.keys[parentPos] = rightSibling.keys[0];
       parent.values[parentPos] = rightSibling.values[0];
-      
+
       // Update sibling.
       shiftLeft(rightSibling, 0);
+      if (!rightSibling.leaf) {
+        shiftChildrenLeft(rightSibling, 0);
+      }
       rightSibling.n--;
     }
-    
+
     /**
-     * Shifts values in the keys and values array right, to make room in position 0.
+     * Shifts values in the keys and values array right, to make room in position
+     * 0.
+     * 
      * @param node - The node to shift values for
-     * @param i - The index to start shifting values at
+     * @param i    - The index to start shifting values at
      */
     private void shiftRight(BTreeNode node, int i) {
       while (i > 0) {
@@ -593,11 +703,12 @@ class BTree {
       node.keys[0] = 0L;
       node.values[0] = 0L;
     }
-    
+
     /**
      * Shifts values in the keys and values arrays left.
+     * 
      * @param node - The node to shift values for
-     * @param i - The index to start shifting values at
+     * @param i    - The index to start shifting values at
      */
     private void shiftLeft(BTreeNode node, int i) {
       // Loop through keys array to shift values down
@@ -615,14 +726,30 @@ class BTree {
         i++;
       } // while
     }
-    
+
+    /**
+     * Shifts children pointers right.
+     * 
+     * @param node - The node to shift children for
+     * @param i    - The index to start shifting values at
+     */
+    private void shiftChildrenRight(BTreeNode node, int i) {
+      // Loop through children array to shift children up
+      while (i > 0) {
+        node.children[i] = node.children[i - 1];
+        i--;
+      }
+      node.children[0] = null;
+    }
+
     /**
      * Shifts children pointers left.
+     * 
      * @param node - The node to shift children for
-     * @param i - The index to start shifting values at
+     * @param i    - The index to start shifting values at
      */
     private void shiftChildrenLeft(BTreeNode node, int i) {
-      // Loop through keys array to shift values down
+      // Loop through children array to shift children down
       while (i <= node.n) {
         // If the number of keys did not fill the array
         if (i + 1 < node.children.length) {
