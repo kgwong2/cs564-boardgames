@@ -71,193 +71,134 @@ class BTree {
     }
 
     BTree insert(Student student) {
-        // Null check
         if (root == null) {
             root = new BTreeNode(t, true);
         }
-        
-        BTreeNode leaf = findLeafNode(root, student.studentId);
-        if (leaf.n == 2 * t) {
-            splitLeafNode(leaf, student);
-        }else {
-            insertIntoLeaf(leaf, student);
-        }
 
-        //insert student into student.csv
-        try(
-            FileWriter fw = new FileWriter("src/Student.csv", true);   
-        ) {
-            fw.write(student.studentId + "," + student.age + "," + student.studentName + "," + student.major + "," + student.level + "," + student.recordId + "\n");
-        } catch (Exception e) {
-            System.out.println("Error writing to student.csv: " + e.getMessage());
-        }
+        // Pass by reference with BtreeNode[] to track new child entry through recursion
+        // [0] = new child node, [1] = new key to be inserted into parent
+        BTreeNode[] newChildEntry = new BTreeNode[2];
 
+        insertNode(root, student, newChildEntry);
+
+        // If newChildEntry is not null, root was split and a new root needs to be created
+        if (newChildEntry[0] != null) {
+            BTreeNode newRoot = new BTreeNode(t, false);
+            newRoot.keys[0] = newChildEntry[1].keys[0];
+            newRoot.children[0] = root;
+            newRoot.children[1] = newChildEntry[0];
+            newRoot.n = 1;
+            root = newRoot;
+        }
         return this;
     }  
 
-    // Find the leaf node where the studentId should be inserted
-    private BTreeNode findLeafNode(BTreeNode node, long studentId) {
-        if (node.leaf) {
-            return node;
-        }
+    private void insertNode(BTreeNode nodePointer, Student student, BTreeNode[] newChildEntry) {
+        if(!nodePointer.leaf) {
+            for (int i = 0; i <= nodePointer.n; i++) {
+                if (i == nodePointer.n || student.studentId < nodePointer.keys[i]) {
+                    insertNode(nodePointer.children[i], student, newChildEntry);
+                    //If no split happened, return
+                    if (newChildEntry[0] == null) {
+                        return;
+                    }else if (nodePointer.n < 2 * t) { 
+                        //If node has space put the new child entry in the current node
+                        //Shift keys and children to the right
+                        int j = nodePointer.n - 1;
+                        while (j >= 0 && nodePointer.keys[j] > newChildEntry[0].keys[0]) {
+                            nodePointer.keys[j + 1] = nodePointer.keys[j];
+                            nodePointer.children[j + 2] = nodePointer.children[j + 1];
+                            j--;
+                        }
+                        nodePointer.keys[j + 1] = newChildEntry[1].keys[0];
+                        nodePointer.children[j + 2] = newChildEntry[0];
+                        nodePointer.n++;
+                        newChildEntry[0] = null;
+                    }else{
+                        //If internal node is full, split it
+                        //Create a new node and move second half of the keys and children to it
+                        BTreeNode newNode = new BTreeNode(t, false);
+                        int midIndex = t;
+                        for (int k = midIndex + 1; k < nodePointer.n; k++) {
+                            newNode.keys[k - midIndex - 1] = nodePointer.keys[k];
+                            newNode.children[k - midIndex - 1] = nodePointer.children[k];
+                        }
+                        //copy the last child pointer
+                        newNode.children[nodePointer.n - midIndex - 1] = nodePointer.children[nodePointer.n];
 
-        int i = 0;
-        while (i < node.n && studentId > node.keys[i]) {
-            i++;
-        }
+                        newNode.n = nodePointer.n - midIndex - 1;
+                        nodePointer.n = midIndex;
+                        
+                        // Insert newChildEntry key and pointer into left or right node
+                        if (newChildEntry[0].keys[0] < nodePointer.keys[midIndex]) {
+                            int j = nodePointer.n - 1;
+                            while (j >= 0 && nodePointer.keys[j] > newChildEntry[0].keys[0]) {
+                                nodePointer.keys[j + 1] = nodePointer.keys[j];
+                                nodePointer.children[j + 2] = nodePointer.children[j + 1];
+                                j--;
+                            }
+                            nodePointer.keys[j + 1] = newChildEntry[0].keys[0];
+                            nodePointer.children[j + 2] = newChildEntry[0];
+                            nodePointer.n++;
+                        } else {
+                            int j = newNode.n - 1;
+                            while (j >= 0 && newNode.keys[j] > newChildEntry[0].keys[0]) {
+                                newNode.keys[j + 1] = newNode.keys[j];
+                                newNode.children[j + 2] = newNode.children[j + 1];
+                                j--;
+                            }
+                        newNode.keys[j + 1] = newChildEntry[0].keys[0];
+                        newNode.children[j + 2] = newChildEntry[0];
+                        newNode.n++;
+                        }
 
-        return findLeafNode(node.children[i], studentId);
-    }
-
-    // Insert the student into the leaf node
-    private void insertIntoLeaf(BTreeNode leaf, Student student) {
-        int i = leaf.n - 1;
-
-        // Find the position to insert the new student to maintain sorted order
-        while (i >= 0 && leaf.keys[i] > student.studentId) {
-            leaf.keys[i + 1] = leaf.keys[i];
-            leaf.values[i + 1] = leaf.values[i];
-            i--;
-        }
-
-        // Insert the new student
-        leaf.keys[i + 1] = student.studentId;
-        leaf.values[i + 1] = student.recordId;
-        leaf.n++;
-    }
-
-    // Split the leaf node if it is full
-    // The new leaf node will be created and the parent will be updated accordingly
-    // If the parent is full, it will call splitInternal to handle that case
-    private void splitLeafNode(BTreeNode leaf, Student student) {
-        BTreeNode newLeaf = new BTreeNode(t, true);
-        long[] tempKeys = new long[2 * t + 1];
-        long[] tempValues = new long[2 * t + 1];
-
-        for (int i = 0; i < leaf.n; i++) {
-            tempKeys[i] = leaf.keys[i];
-            tempValues[i] = leaf.values[i];
-        }
-
-        // Insert the new key into temp arrays
-        int i = leaf.n - 1;
-        while (i >= 0 && student.studentId < tempKeys[i]) {
-            tempKeys[i + 1] = tempKeys[i];
-            tempValues[i + 1] = tempValues[i];
-            i--;
-        }
-        tempKeys[i + 1] = student.studentId;
-        tempValues[i + 1] = student.recordId;
-        int total = leaf.n + 1;
-
-        // Copy the first half to original leaf
-        for (i = 0; i < t; i++) {
-            leaf.keys[i] = tempKeys[i];
-            leaf.values[i] = tempValues[i];
-        }
-        leaf.n = t;
-
-        // Copy the second half to new leaf
-        for (i = t; i < total; i++) {
-            newLeaf.keys[i - t] = tempKeys[i];
-            newLeaf.values[i - t] = tempValues[i];
-        }
-        newLeaf.n = total - t;
-
-        newLeaf.next = leaf.next;
-        leaf.next = newLeaf;
-
-        // Insert the middle value into the parent node, if the leaf is the root, create a new root
-        if (leaf == root) {
-            BTreeNode newRoot = new BTreeNode(t, false);
-            newRoot.keys[0] = newLeaf.keys[0];
-            newRoot.children[0] = leaf;
-            newRoot.children[1] = newLeaf;
-            newRoot.n = 1;
-            root = newRoot;
-        } else {
-            insertIntoParent(leaf, newLeaf.keys[0], newLeaf);
-        }
-    }
-    
-    // Insert the new leaf into the parent node
-    // If the parent is full, it will call splitInternal to handle that case
-    // If the parent is the root, it will create a new root node and update the root pointer accordingly
-    private void insertIntoParent(BTreeNode leaf, long key, BTreeNode newLeaf) {
-        BTreeNode parent = findParent(root, leaf);
-        if (parent == null) {
-            // If there is no parent, create a new root
-            BTreeNode newRoot = new BTreeNode(t, false);
-            newRoot.keys[0] = key;
-            newRoot.children[0] = leaf;
-            newRoot.children[1] = newLeaf;
-            newRoot.n = 1;
-            root = newRoot;
-        } else {
-            // If the parent is full, split it
-            if (parent.n == 2 * t) {
-                splitParent(parent);
-            }
-            // Insert the key into the parent node
-            int i = parent.n - 1;
-            while (i >= 0 && parent.keys[i] > key) {
-                parent.keys[i + 1] = parent.keys[i];
-                parent.children[i + 2] = parent.children[i + 1];
-                i--;
-            }
-            parent.keys[i + 1] = key;
-            parent.children[i + 2] = newLeaf;
-            parent.n++;
-        } 
-    }
-
-    // Find the parent of the given node
-    // If the parent is not found, it returns null
-    private BTreeNode findParent(BTreeNode node, BTreeNode child) {
-        if (node == null || node.leaf) {
-            return null; // No parent for root or leaf nodes
-        }
-
-        for (int i = 0; i < node.n + 1; i++) {
-            if (node.children[i] == child) {
-                return node; // Found the parent
-            } else {
-                BTreeNode parent = findParent(node.children[i], child);
-                if (parent != null) {
-                    return parent;
+                        // Set newChildEntry to the new node and the key to be inserted into parent
+                        newChildEntry[0] = newNode;
+                        newChildEntry[1] = new BTreeNode(t, false);
+                        newChildEntry[1].keys[0] = nodePointer.keys[midIndex];
+                    }
                 }
             }
-        }
-        return null;
-    }
-    // Split the parent node if it is full
-    // If the parent is full, it will call splitInternal to handle that case
-    // The new key is the middle key that will be moved up to the parent
-    private void splitParent(BTreeNode node) {
-        BTreeNode newInternal = new BTreeNode(t, false);
-        int midIndex = t - 1; // Middle index for splitting
 
-        // Move the second half of the keys and children to the new internal node excluding the middle key
-        for (int i = midIndex + 1; i < node.n; i++) {
-            newInternal.keys[i - (midIndex + 1)] = node.keys[i];
-        }
-        for (int i = midIndex + 1; i <= node.n; i++) {
-            newInternal.children[i - (midIndex + 1)] = node.children[i];
-        }
+        } else{
+            // If node is a leaf, insert the student directly
+            if (nodePointer.n < 2 * t) {
+                int i = nodePointer.n - 1;            
+                while (i >= 0 && nodePointer.keys[i] > student.studentId) {
+                    nodePointer.keys[i + 1] = nodePointer.keys[i];
+                    nodePointer.values[i + 1] = nodePointer.values[i];
+                    i--;
+                }
 
-        newInternal.n = node.n - (midIndex + 1);
-        node.n = midIndex;
+            nodePointer.keys[i + 1] = student.studentId;
+            nodePointer.values[i + 1] = student.recordId;
+            nodePointer.n++;
+            newChildEntry[0] = null;
+            } else {
+                // If leaf is full, split it
+                BTreeNode newNode = new BTreeNode(t, true);
+                int midIndex = t;
+                for (int k = midIndex; k < nodePointer.n; k++) {
+                    newNode.keys[k - midIndex] = nodePointer.keys[k];
+                    newNode.values[k - midIndex] = nodePointer.values[k];
+                }
+                newNode.n = nodePointer.n - midIndex;
+                nodePointer.n = midIndex;
 
-        // If the node is the root, create a new root
-        if (node == root) {
-            BTreeNode newRoot = new BTreeNode(t, false);
-            newRoot.keys[0] = node.keys[midIndex]; 
-            newRoot.children[0] = node;
-            newRoot.children[1] = newInternal;
-            newRoot.n = 1;
-            root = newRoot;
-        } else {
-            insertIntoParent(node, node.keys[midIndex], newInternal);
+                newChildEntry[0] = newNode;
+                newChildEntry[1] = new BTreeNode(t, false);
+                newChildEntry[1].keys[0] = newNode.keys[0];
+
+                //set sibling pointers
+                if (nodePointer.next != null) {
+                    newNode.next = nodePointer.next;
+                    nodePointer.next = newNode;
+                }else {
+                    nodePointer.next = newNode;
+                }
+
+                return;
+            }
         }
     }
 
