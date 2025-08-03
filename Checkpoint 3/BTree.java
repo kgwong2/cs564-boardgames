@@ -83,15 +83,6 @@ class BTree {
             insertIntoLeaf(leaf, student);
         }
 
-        //insert student into student.csv
-        try(
-            FileWriter fw = new FileWriter("src/Student.csv", true);   
-        ) {
-            fw.write(student.studentId + "," + student.age + "," + student.studentName + "," + student.major + "," + student.level + "," + student.recordId + "\n");
-        } catch (Exception e) {
-            System.out.println("Error writing to student.csv: " + e.getMessage());
-        }
-
         return this;
     }  
 
