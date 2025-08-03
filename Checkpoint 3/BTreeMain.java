@@ -1,10 +1,9 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Scanner;
+import java.util.Random;
 
 /**
  * Main Application.
@@ -62,18 +61,6 @@ public class BTreeMain {
 
                             Student s = new Student(studentId, age, studentName, major, level, recordID);
                             bTree.insert(s);
-                            
-                            if(!studentsDB.contains(s)) {
-                                studentsDB.add(s);
-                                //insert student into student.csv
-                                try(
-                                    FileWriter fw = new FileWriter("src/Student.csv", true);   
-                                ) {
-                                    fw.write(studentId + "," + studentName + "," + major + "," + age + "," + recordID + "\n");
-                                } catch (Exception e) {
-                                    System.out.println("Error writing to student.csv: " + e.getMessage());
-                                }
-                            }
                             System.out.println("Student inserted successfully.");
 
                             break;
