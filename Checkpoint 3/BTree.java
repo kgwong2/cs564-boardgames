@@ -221,29 +221,36 @@ class BTree {
       // If deletion succeeds, delete in student.csv.
       if (isDeleted) {
         try {
-          String newFileName = "StudentCopy.csv";
+          // Read from file.
           BufferedReader reader =
-              new BufferedReader(new FileReader("Student.csv"));
-          FileWriter writer = new FileWriter(newFileName);
-
-          String line = reader.readLine();
+              new BufferedReader(new FileReader("src/Student.csv"));
+          
+          String curLine = reader.readLine();
           String splitBy = ",";
-
-          while (line != null) {
-            String[] studentData = line.split(splitBy);
+          List<String> linesToWrite = new ArrayList<String>();
+          
+          while (curLine != null) {
+            String[] studentData = curLine.split(splitBy);
             long csvstudentId = Long.parseLong(studentData[0]);
             if (csvstudentId != studentId) {
-              writer.append(line);
-              writer.append("\n");
+              linesToWrite.add(curLine);
             }
-            line = reader.readLine();
+            curLine = reader.readLine();
           } // while
-
+          
           reader.close();
+          
+          // Write to file.
+          FileWriter writer = new FileWriter("src/Student.csv");
+          for (int i = 0; i < linesToWrite.size(); i++) {
+            writer.write(linesToWrite.get(i));
+            writer.write("\n");
+          }
           writer.close();
 
         } catch (IOException e) {
-          System.out.println("Error updating student.csv.");
+          e.printStackTrace();
+          System.out.println("Error updating student.csv for deletion.");
         }
       }
 
