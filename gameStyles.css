@@ -72,3 +72,8 @@ body {
     font-size: 1.17em;
 }
 
+._inlineBlock {
+    display: inline-block;
+    margin: 0px;
+}
+
