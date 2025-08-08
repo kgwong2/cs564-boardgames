@@ -2,18 +2,33 @@
 <html>
 
 <head>
-
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="gameStyles.css">
 </head>
 
 <body>
-    Sign Up<br>
-    Username<br>
-    <input type="text"><br>
-    Password<br>
-    <input type="text"><br>
-    Confirm Password<br>
-    <input type="text"><br>
-    <button>Sign Up</button>
+    <nav id="navbar">
+        <a href="Main.html">Home</a>
+        <a href="Search.html">Search</a>
+        <a href="User.html">Profile</a>
+    </nav>
+
+    <div id="loginContainer">
+        <h2>Sign Up</h2>
+        <form id="loginSignForm" action="Login.html" onsubmit="return validateSignUp()">
+            <div id="inputsWrapper">
+                <input id="newUserName" name="newUserName" placeholder="Choose a username">
+                <input id="newPassword" name="newPassword" placeholder="Choose a password">
+                <input id="confirmPassword" name="confirmPassword" placeholder="Confirm password">
+            </div>
+            <button type="submit">Sign Up</button>
+            <div id=registerLoginLink>
+                Already have an account? <a href="login.html">Login</a>
+            </div>
+        </form>
+    </div>
+
+    <script src="signup.js"></script>
 </body>
 
 </html>
