@@ -77,3 +77,74 @@ body {
     margin: 0px;
 }
 
+#loginContainer {
+    width: 350px;
+    margin: 100px auto 0 auto;
+    font-family: Tahoma;
+    text-align: center; 
+}
+
+#inputsWrapper {
+    width: 300px;
+    margin: 0 auto;
+    text-align: left;  
+}
+
+#inputsWrapper input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid black;
+    font-size: 1em;
+}
+
+#loginContainer h2 {
+    font-size: 1.5em;
+}
+
+#loginSignForm button {
+    width: 150px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid black;
+    font-size: 1em;
+    font-family: Tahoma;
+}
+
+#registerLoginLink {
+    font-size: 0.8em;
+    text-align: center;
+}
+
+#navbar {
+    background-color: lightsteelblue;
+    border: 1px solid black;
+    padding: 15px;
+    font-family: Tahoma;
+    margin-bottom: 15px;
+}
+
+#navbar a {
+    color: black;
+    margin-right: 20px;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+#profileContainer {
+  width: 600px;
+  margin: 50px auto;
+  font-family: Tahoma;
+}
+
+#profileContainer h1 {
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+#profileInfo {
+  border: 1px solid black;
+  padding: 15px;
+  background-color: lightsteelblue;
+  border-radius: 8px;
+}
