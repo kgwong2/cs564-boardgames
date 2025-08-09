@@ -376,8 +376,8 @@ class BTree {
       else {
         int i = findKeysIndex(node, studentId); // Find studentId keys index.
 
-        // If index is same as length of keys array, studentId was not found.
-        if (i == node.keys.length) {
+        // If index is same as number of keys, studentId was not found.
+        if (i == node.n) {
           return false;
         }
         // Otherwise, studentId was found.
