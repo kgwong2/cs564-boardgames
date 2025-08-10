@@ -364,7 +364,7 @@ class BTree {
           // Node doesn't have entries to spare
           else {
             // Find indices in the parent's children array
-            int nodeIndex = findChildIndex(parent, oldStudentId.value);
+            int nodeIndex = findNodeIndex(parent, node);
             int siblingIndex = findSiblingIndex(parent, nodeIndex);
 
             // Redistribute between node and sibling
@@ -384,7 +384,8 @@ class BTree {
               }
               oldStudentId.value = parent.keys[parentKeyIndex];
               // Remove studentId from node.
-              shiftRight(node, i);
+              shiftLeft(node, i);
+              shiftChildrenLeft(node, i + 1);
               merge(parent, nodeIndex);
               return isDeleted;
             }
@@ -431,7 +432,7 @@ class BTree {
               }
               oldStudentId.value = parent.keys[parentKeyIndex];
               // Remove studentId from node.
-              shiftRight(node, i);
+              shiftLeft(node, i);
               merge(parent, nodeIndex);
               return true;
             } // else merge
@@ -452,6 +453,23 @@ class BTree {
       }
     }
 
+    /**
+     * Finds the node's index at the parent.
+     * @param parent - The parent node
+     * @param node - Node to find index for
+     * @return Index of node in parent's children array
+     */
+    private int findNodeIndex(BTreeNode parent, BTreeNode node) {
+      int i = 0;
+      while (i < parent.n) {
+        if (parent.children[i] == node) {
+          return i;
+        }
+        i++;
+      }
+      return i;
+    }
+    
     /**
      * Finds the node's children array index for a given studentId.
      * 
@@ -565,7 +583,7 @@ class BTree {
       if (sibIndex < nodeIndex) {
         shiftRight(node, studentIndex); // Remove studentId
         if (!node.leaf) {
-          shiftChildrenRight(node, studentIndex);
+          shiftChildrenRight(node, studentIndex + 1);
         }
         rotateRight(parent, nodeIndex, sibIndex);
       }
@@ -599,11 +617,17 @@ class BTree {
         // Node <-- parent
         node.keys[node.n - 1] = parent.keys[parentIndex];
         node.values[node.n - 1] = parent.values[parentIndex];
+        if (!node.leaf) {
+          node.children[node.n] = rightSib.children[0];
+        }
         // Node <-- sibling
         int j = 0; // Sibling keys and values index
         for (int i = node.n; i < node.keys.length; i++) {
           node.keys[i] = rightSib.keys[j];
           node.values[i] = rightSib.values[j];
+          if (!node.leaf) {
+            node.children[i + 1] = rightSib.children[j + 1];
+          }
           node.n++;
           j++;
           // Exit the loop after all sibling keys and values have been moved.
@@ -626,12 +650,18 @@ class BTree {
         // Sibling <-- parent
         leftSib.keys[leftSib.n] = parent.keys[parentPos];
         leftSib.values[leftSib.n] = parent.values[parentPos];
+        if (!node.leaf) {
+          leftSib.children[leftSib.n + 1] = node.children[0];
+        }
         leftSib.n++;
         // Sibling <-- node
         int j = 0; // Node keys and values index
         for (int i = leftSib.n; i < leftSib.keys.length; i++) {
           leftSib.keys[i] = node.keys[j];
           leftSib.values[i] = node.values[j];
+          if (!leftSib.leaf) {
+            leftSib.children[i + 1] = node.children[j + 1];
+          }
           leftSib.n++;
           j++;
           // Exit the loop after all node keys and values have been moved.
@@ -675,6 +705,9 @@ class BTree {
       // Update sibling.
       leftSibling.keys[leftSibling.n - 1] = 0L;
       leftSibling.values[leftSibling.n - 1] = 0L;
+      if (!node.leaf) {
+        leftSibling.children[leftSibling.n] = null;
+      }
       leftSibling.n--;
     }
 
