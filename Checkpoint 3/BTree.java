@@ -341,8 +341,20 @@ class BTree {
         else {
           int i = findKeysIndex(node, oldStudentId.value);
 
-          // Node has entries to spare OR the node is the root
-          if (node.n > node.t || parent == null) {
+          // Node is root
+          if (parent == null) {
+            shiftLeft(node, i);
+            shiftChildrenLeft(node, i + 1);
+            node.n--;
+            oldStudentId.value = -1;
+            // Check if there are values in node. If not, child is the new root.
+            if (node.n == 0) {
+              this.root = node.children[0];
+            }
+            return isDeleted;
+          }
+          // Node has entries to spare
+          if (node.n > node.t) {
             shiftLeft(node, i);
             shiftChildrenLeft(node, i + 1);
             node.n--;
@@ -364,7 +376,14 @@ class BTree {
             // Merge node and sibling
             else {
               // Set oldStudentId for recursive removal and check.
-              oldStudentId.value = parent.keys[nodeIndex];
+              int parentKeyIndex;
+              if (nodeIndex == parent.n) {
+                parentKeyIndex = nodeIndex - 1;
+              } else {
+                parentKeyIndex = nodeIndex;
+              }
+              oldStudentId.value = parent.keys[parentKeyIndex];
+              // Remove studentId from node.
               shiftRight(node, i);
               merge(parent, nodeIndex);
               return isDeleted;
@@ -404,7 +423,14 @@ class BTree {
             // Merge node and sibling
             else {
               // Set oldStudentId for recursive removal and check.
-              oldStudentId.value = parent.keys[nodeIndex];
+              int parentKeyIndex;
+              if (nodeIndex == parent.n) {
+                parentKeyIndex = nodeIndex - 1;
+              } else {
+                parentKeyIndex = nodeIndex;
+              }
+              oldStudentId.value = parent.keys[parentKeyIndex];
+              // Remove studentId from node.
               shiftRight(node, i);
               merge(parent, nodeIndex);
               return true;
