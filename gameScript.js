@@ -1,47 +1,31 @@
-/**
- * async function fetchData() {
-    try {
-        const response = await fetch('/api/data');
-        const data = await response.json();
-        console.log(data); // Process your data here
-    } catch (error) {
-        console.error('Error fetching data:', error);
-    }
-}
+// Set connections
+let mysql = require('mysql');
 
-fetchData();
-https://www.w3schools.com/jsref/api_fetch.asp
+let connection = mysql.createConnection({
+    host: "147.219.74.241",
+    port: "3306",
+    user: "boardgame",
+    password: "uwmadison",
+    database: "boardgames"
+});
 
-----
-Backend
-API endpoints /api/data, /api/users that handle requests from the frontend. Routes will contain logic to 
-interact with the SQL Server database (eg select, insert, update, delete)
+connection.connect(function(e) {
+    if (e) throw e;
+    
+        connection.query("SELECT * FROM boardgame b WHERE b.id = 13", function (e, result, fields) {
+        if (e) throw e;
+        //let gameTitle = console.log(result[0].name);
+    });
 
----
-Frontend
-Fetch data. Use fetch API
-Process responses. When the frontend receives a JSON response, parse the data and use it to update
-the user interface
-Handle user interactions
+    //document.getElementById("gameImageId").innerText = gameTitle;
+});
 
-async function getGameData(boardGameName) {
-    try {
-        const response = await fetch("/api/boardgame");
-        const gameData = await response.json();
-        console.log(gameData); // Process data, from array of
-    } catch (error) {
-        console.error('Error fetching data:', error);
-    }
-}
- */
-
-// setting .value is used for input/form elements
-// setting .innerHTML is for div/span/td/etc. elements
-
+// Javascript
 function getGameImage() {
     document.getElementById("gameImageId").innerHTML = "<img src='https://cf.geekdo-images.com/lqmt2Oti_qJS65XqHcB8AA__itemrep/img/_iR9fdW4a3BsMh296ljKJj_EYOo=/fit-in/246x300/filters:strip_icc()/pic5146864.png'>";
-}
-getGameImage()
+};
+getGameImage();
+
 
 function getGameTitle() {
     document.getElementById("gameTitleId").innerText = "Betrayal at House on the Hill";
