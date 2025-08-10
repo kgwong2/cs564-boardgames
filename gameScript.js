@@ -10,6 +10,29 @@
 }
 
 fetchData();
+https://www.w3schools.com/jsref/api_fetch.asp
+
+----
+Backend
+API endpoints /api/data, /api/users that handle requests from the frontend. Routes will contain logic to 
+interact with the SQL Server database (eg select, insert, update, delete)
+
+---
+Frontend
+Fetch data. Use fetch API
+Process responses. When the frontend receives a JSON response, parse the data and use it to update
+the user interface
+Handle user interactions
+
+async function getGameData(boardGameName) {
+    try {
+        const response = await fetch("/api/boardgame");
+        const gameData = await response.json();
+        console.log(gameData); // Process data, from array of
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
  */
 
 // setting .value is used for input/form elements
