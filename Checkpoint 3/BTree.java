@@ -541,7 +541,7 @@ class BTree {
         if (!node.leaf) {
           shiftChildrenRight(node, studentIndex);
         }
-        rotateRight(parent, studentIndex, sibIndex);
+        rotateRight(parent, nodeIndex, sibIndex);
       }
       // Pull from right sibling (rotate left)
       else {
@@ -549,7 +549,7 @@ class BTree {
         if (!node.leaf) {
           shiftChildrenLeft(node, studentIndex + 1);
         }
-        rotateLeft(parent, studentIndex, sibIndex);
+        rotateLeft(parent, nodeIndex, sibIndex);
       }
     }
 
