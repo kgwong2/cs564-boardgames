@@ -10,7 +10,7 @@ const port = 3000;
 // Set up connections
 let db = mysql.createConnection({
     host: "147.219.74.241",
-    port: port,
+    port: 3306,
     user: "boardgame",
     password: "uwmadison",
     database: "boardgames"
