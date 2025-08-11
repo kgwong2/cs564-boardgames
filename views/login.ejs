@@ -10,10 +10,26 @@
     <nav id="navbar">
         <a href="/">Home</a>
         <a href="/search">Search</a>
-        <a href="/user">Profile</a>
+        <a class="_userNav" href="/user">My Profile</a>
+        <a class="_userNav" href="/login">Log In</a>
+        <a class="_userNav" href="/signup">Sign Up</a>
     </nav>
 
-    <!-- Login form content would go here -->
+    <div id="loginContainer">
+        <h2>Login</h2>
+        <form id="loginSignForm" action="User.html" onsubmit="return validateLogin()">
+            <div id="inputsWrapper">
+                <input id="userName" name="userName" placeholder="Enter username">
+                <input id="password" name="password" placeholder="Enter password">
+            </div>
+            <button type="submit">Login</button>
+            <div id=registerLoginLink>
+                Don't have an account? <a href="SignUp.html">Sign up</a>
+            </div>
+        </form>
+    </div>
+
+    <script src="login.js"></script>
 
 </body>
 

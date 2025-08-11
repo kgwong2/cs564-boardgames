@@ -10,10 +10,104 @@
     <nav id="navbar">
         <a href="/">Home</a>
         <a href="/search">Search</a>
-        <a href="/user">Profile</a>
+        <a class="_userNav" href="/user">My Profile</a>
+        <a class="_userNav" href="/login">Log In</a>
+        <a class="_userNav" href="/signup">Sign Up</a>
     </nav>
 
-    <h1>Search Page</h1>
+    <h1>Search</h1>
+
+    <div class="_row">
+        <!--Search Sidebar-->
+        <div id="_searchColumn" class="_column">
+            <!--Game title-->
+            <div class="_searchCategory">
+                <div class="_searchCategoryName">
+                    Game title
+                </div>
+                <div class="_searchCategoryContents">
+                    <search>
+                        <form>
+                            <input class="_searchFields" placeholder="Enter search term">
+                        </form>
+                    </search>
+                </div>
+            </div>
+            <!--Number of players-->
+            <div class="_searchCategory">
+                <div class="_searchCategoryName">
+                    <input type="checkbox">
+                    Number of players
+                </div>
+                <div class="_searchCategoryContents">
+                    <div>
+                        <input type="range" min="1" max="5" value="2">
+                        <br>update to slider value
+                    </div>
+                </div>
+            </div>
+            <!--Playtime-->
+            <div class="_searchCategory">
+                <div class="_searchCategoryName">
+                    <input type="checkbox">
+                    Playtime
+                </div>
+                <div class="_searchCategoryContents">
+                    <div>
+                        <input type="range" min="1" max="5" value="2">
+                        <br>update to slider value
+                    </div>
+                </div>
+            </div>
+            <!--Creators-->
+            <div class="_searchCategory">
+                <div class="_searchCategoryName">
+                    Creators
+                </div>
+                <div class="_searchCategoryContents">
+                    <search>
+                        <form>
+                            <input class="_searchFields" placeholder="Enter search term">
+                        </form>
+                    </search>
+                </div>
+            </div>
+            <!--Search button-->
+            <button>Search</button>
+        </div>
+        <!--List of Games-->
+        <div id="_gamesColumn" class="_column">
+            <div id="_searchResultsCountId" align="right">(Showing # results)</div>
+            <!--Game example-->
+            <div class="_listedGame">
+                <table>
+                    <tr>
+                        <td rowspan="2" class="_gameImg">Image</td>
+                        <td class="_gameTitle">Game title</td>
+                    </tr>
+                    <tr>
+                        <td class="_gameInfo">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum fringilla tortor risus, vel ultrices massa laoreet commodo. Aenean eleifend ac ligula sed eleifend. Proin sollicitudin mi nulla, vitae accumsan lectus auctor consectetur. Suspendisse ut nulla enim. Nulla rutrum nisl dui, sed malesuada massa sodales ac. Aliquam erat volutpat. Nam sed tincidunt augue. Phasellus vel arcu nisi. Ut hendrerit odio leo, venenatis faucibus mauris luctus eget. Maecenas eget urna consectetur, ultrices lectus nec, aliquam mi. Interdum et malesuada fames ac ante ipsum primis in faucibus. Maecenas sollicitudin accumsan tellus at gravida. Curabitur efficitur blandit urna, vel ultrices quam condimentum eu. Sed nec nunc est.
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!--Game example 2-->
+            <div class="_listedGame">
+                <table>
+                    <tr>
+                        <td rowspan="2" class="_gameImg">Image</td>
+                        <td class="_gameTitle">Game title</td>
+                    </tr>
+                    <tr>
+                        <td class="_gameInfo">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum fringilla tortor risus, vel ultrices massa laoreet commodo. Aenean eleifend ac ligula sed eleifend. Proin sollicitudin mi nulla, vitae accumsan lectus auctor consectetur. Suspendisse ut nulla enim. Nulla rutrum nisl dui, sed malesuada massa sodales ac. Aliquam erat volutpat. Nam sed tincidunt augue. Phasellus vel arcu nisi. Ut hendrerit odio leo, venenatis faucibus mauris luctus eget. Maecenas eget urna consectetur, ultrices lectus nec, aliquam mi. Interdum et malesuada fames ac ante ipsum primis in faucibus. Maecenas sollicitudin accumsan tellus at gravida. Curabitur efficitur blandit urna, vel ultrices quam condimentum eu. Sed nec nunc est.
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
 
 </body>
 

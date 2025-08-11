@@ -3,6 +3,19 @@ body {
     font-family: Tahoma;
 }
 
+button {
+    width: 150px;
+    padding: 8px;
+    border: 1px solid black;
+    font-size: 1em;
+    font-family: Tahoma;
+}
+
+button:hover {
+    background-color: gainsboro;
+    border: 1px solid dimgray;
+}
+
 ._column {
     float: left;
     margin: 5px;
@@ -37,11 +50,16 @@ body {
     padding: 5px;
 }
 
+._searchFields {
+    width: 90%;
+    padding: 8px;
+    border: 1px solid black;
+}
+
 ._listedGame {
     margin-bottom: 5px;
     background-color: lightsteelblue;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    border: 1px solid black;
 }
 
 ._gameImg {

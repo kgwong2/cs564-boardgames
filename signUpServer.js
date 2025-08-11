@@ -42,6 +42,10 @@ app.get('/login', (req, res) => {
     res.render('login');
 });
 
+app.get('/game', (req, res) => {
+    res.render('game');
+});
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

@@ -2,8 +2,8 @@
 <html>
 
 <head>
-    <title>Main</title>
     <link rel="stylesheet" href="/styles/gameStyles.css">
+    <script src="gameScript.js" defer></script>
 </head>
 
 <body>
@@ -14,16 +14,12 @@
         <a class="_userNav" href="/login">Log In</a>
         <a class="_userNav" href="/signup">Sign Up</a>
     </nav>
-
-    <h1>Top 10 Games</h1>
     <!--Game-->
     <div class="_listedGame">
         <table>
             <tr>
                 <td id="gameImageId" rowspan="4" class="_gameImg">Image</td>
-                <td id="gameTitleId" colspan="5" class="_gameTitle">
-                    <a href="/game">Game title</a>
-                </td>
+                <td id="gameTitleId" colspan="5" class="_gameTitle">Game title</td>
             </tr>
             <tr>
                 <td colspan="5" class="_gameInfo">
@@ -69,6 +65,29 @@
                         Creators
                     </div>
                     List...
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!--Reviews-->
+    <h2>Reviews</h2>
+    <button>Add Review</button><br>
+    <div class="_listedReview">
+        <table>
+            <tr>
+                <td rowspan="2">
+                    <div class="_ratingBox">
+                        rating
+                    </div>
+                </td>
+                <td>
+                    username
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    comment...
                 </td>
             </tr>
         </table>
