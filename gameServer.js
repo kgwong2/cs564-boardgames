@@ -1,0 +1,34 @@
+// Import modules
+const express = require('express');
+const path = require('path');
+const mysql = require('mysql');
+
+// Create Express app
+const app = express();
+const port = 3000;
+
+// Set up connections
+let db = mysql.createConnection({
+    host: "147.219.74.241",
+    port: port,
+    user: "boardgame",
+    password: "uwmadison",
+    database: "boardgames"
+});
+
+db.connect(err => {
+    if (err) throw err;
+    console.log('MySQL Connected...');
+});
+
+app.get('/boardGameInfo', (req, res) => {
+    let sql = 'SELECT b.name FROM boardgame b WHERE b.id = 13';
+    db.query(sql, (err, results) => {
+        if (err) throw err;
+        res.json(results); // send data as JSON
+    });
+});
+
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
