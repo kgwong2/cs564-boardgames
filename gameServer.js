@@ -1,7 +1,7 @@
 // Import modules
 const express = require('express');
 const path = require('path');
-const mysql = require('mysql');
+const mysql = require('mysql2');
 
 // Create Express app
 const app = express();
@@ -16,10 +16,18 @@ let db = mysql.createConnection({
     database: "boardgames"
 });
 
-db.connect(err => {
-    if (err) throw err;
-    console.log('MySQL Connected...');
-});
+db.query(
+  'SELECT * FROM `boardgame` WHERE `id` = 13',
+  function (err, results, fields) {
+    console.log(results); // results contains rows returned by server
+    console.log(fields); // fields contains extra meta data about results, if available
+  }
+);
+
+// db.connect(err => {
+//     if (err) throw err;
+//     console.log('MySQL Connected...');
+// });
 
 app.get('/boardGameInfo', (req, res) => {
     let sql = 'SELECT b.name FROM boardgame b WHERE b.id = 13';
