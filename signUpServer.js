@@ -1,8 +1,24 @@
-
 // Import required modules
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
+const mysql = require('mysql2');
+
+const db = mysql.createConnection({
+    host: '147.219.74.241',
+    port: 3306,
+    database: 'boardgames',
+    user: 'boardgame',
+    password: 'uwmadison'
+});
+
+db.connect((err) => {
+    if (err) {
+        console.error('Error connecting to the database:', err);
+        return;
+    }
+    console.log('Connected to the MySQL database');
+});
 
 // Create Express app
 const app = express();
@@ -33,13 +49,39 @@ app.get('/signup', (req, res) => {
 });
 
 app.post('/signup', (req, res) => {
-    // In a real application, you would validate and process the signup data here
-    // For this example, we'll just redirect to the login page
-    res.redirect('/login');
+    const {newUserName, newPassword} = req.body;
+    const checkUserSql = 'SELECT * FROM user WHERE username = ?';
+    db.query(checkUserSql, [newUserName], (err, results) => {
+        if (err) throw err;
+        if (results.length > 0) {
+            return res.status(400).send('Username already exists');
+        }
+        // Insert new user into database
+        const insertUserSql = 'INSERT INTO user (username, password) VALUES (?, ?)';
+        db.query(insertUserSql, [newUserName, newPassword], (err, results) => {
+            if (err) throw err;
+            console.log('User signed up successfully:', results);
+        });
+        res.redirect('/login');
+    });
 });
 
 app.get('/login', (req, res) => {
     res.render('login');
+});
+
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+    const loginSql = 'SELECT * FROM user WHERE username = ? AND password = ?';
+    db.query(loginSql, [username, password], (err, results) => {
+        if (err) throw err;
+        if (results.length > 0) {
+            console.log('User logged in successfully:', results);
+            res.redirect('/user?username=${username}');
+        } else {
+            res.render('login', { error: 'Invalid username or password' });
+        }
+    });
 });
 
 app.get('/game', (req, res) => {

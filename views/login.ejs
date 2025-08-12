@@ -17,16 +17,19 @@
 
     <div id="loginContainer">
         <h2>Login</h2>
-        <form id="loginSignForm" action="User.html" onsubmit="return validateLogin()">
+        <form id="loginSignForm" action="/login" method="POST">
             <div id="inputsWrapper">
-                <input id="userName" name="userName" placeholder="Enter username">
+                <input id="username" name="username" placeholder="Enter username">
                 <input id="password" name="password" placeholder="Enter password">
             </div>
             <button type="submit">Login</button>
             <div id=registerLoginLink>
-                Don't have an account? <a href="SignUp.html">Sign up</a>
+                Don't have an account? <a href="/signup">Sign up</a>
             </div>
         </form>
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="error-message" style="margin-bottom: 10px;" ></div><%= error %></div>
+        <% } %>
     </div>
 
     <script src="login.js"></script>
