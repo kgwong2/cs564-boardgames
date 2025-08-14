@@ -88,6 +88,15 @@ app.get('/game', (req, res) => {
     res.render('game');
 });
 
+app.get('/boardGameInfo', async (req, res) => {
+    // TODO dynamically set id
+    let sql = 'SELECT * FROM boardgame b WHERE b.id = 13';
+    db.query(sql, (err, results) => {
+        if (err) throw err;
+        res.json(results); // send data as JSON
+    });
+});
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
