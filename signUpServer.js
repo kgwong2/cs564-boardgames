@@ -36,6 +36,15 @@ app.get('/', (req, res) => {
     res.render('main');
 });
 
+app.get('/topTenGames', async (req, res) => {
+    let sql = 'SELECT b.id, b.image, b.name, b.description, AVG(r.rating) AS score FROM boardgame b INNER JOIN review r ON b.id = r.boardGameId GROUP BY b.id ORDER BY score DESC LIMIT 10';
+
+    db.query(sql, (err, results) => {
+        if (err) throw err;
+        res.json(results); // send data as JSON
+    });
+});
+
 app.get('/search', (req, res) => {
     res.render('search');
 });

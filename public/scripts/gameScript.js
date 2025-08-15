@@ -19,9 +19,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         let imgUrl = data[0].image;
         let htmlImg = "<img src='" + imgUrl + "' width='300'>";
         let curDesc = data[0].description;
-        let newDesc = curDesc.replaceAll("&#10;", "\n");
-        // clean up &mdash; to —
-        // create new function to do this
+        let newDesc = curDesc
+            .replaceAll("&#10;", "\n")
+            .replaceAll("&mdash;", "—")
+            .replaceAll("&quot;", "\"")
+            .replaceAll("&ldquo;", "\"")
+            .replaceAll("&rdquo;", "\"")
+            .replaceAll("&rsquo;", "'")
+            .replaceAll("&lsquo;", "'")
+            .replaceAll("&amp;", "&")
+            .replaceAll("&nbsp;", " ")
+            .replaceAll("&#9;", "   ")
+            .replaceAll("&uuml;", "ü")
+            .replaceAll("&times;", "×")
+            .replaceAll("&Prime;", "″");
 
         // Populate
         gameTitle.innerText = data[0].name;

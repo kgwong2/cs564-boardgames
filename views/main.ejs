@@ -4,6 +4,7 @@
 <head>
     <title>Main</title>
     <link rel="stylesheet" href="/styles/gameStyles.css">
+    <script src="/scripts/mainScript.js" defer></script>
 </head>
 
 <body>
@@ -16,62 +17,10 @@
     </nav>
 
     <h1>Top 10 Games</h1>
-    <!--Game-->
-    <div class="_listedGame">
-        <table>
-            <tr>
-                <td id="gameImageId" rowspan="4" class="_gameImg">Image</td>
-                <td id="gameTitleId" colspan="5" class="_gameTitle">
-                    <a href="/game">Game title</a>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="5" class="_gameInfo">
-                    <div id="gamePublishYearId">(Year published)</div><br>
-                    <div id="gameDescriptionId">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum fringilla tortor risus, vel ultrices massa laoreet commodo. Aenean eleifend ac ligula sed eleifend. Proin sollicitudin mi nulla, vitae accumsan lectus auctor consectetur. Suspendisse ut nulla enim. Nulla rutrum nisl dui, sed malesuada massa sodales ac. Aliquam erat volutpat. Nam sed tincidunt augue. Phasellus vel arcu nisi. Ut hendrerit odio leo, venenatis faucibus mauris luctus eget. Maecenas eget urna consectetur, ultrices lectus nec, aliquam mi. Interdum et malesuada fames ac ante ipsum primis in faucibus. Maecenas sollicitudin accumsan tellus at gravida. Curabitur efficitur blandit urna, vel ultrices quam condimentum eu. Sed nec nunc est.</div><br>
-                </td>
-            </tr>
-            <tr>
-                <td class="_gameInfo _gameMetadata">
-                    <div class="_h3">
-                        <p id="gameWeightId" class="_inlineBlock">averageWeight</p>
-                        <p class="_inlineBlock"> / 5</p>
-                    </div>
-                    Complexity<br>
-                </td>
-                <td class="_gameInfo _gameMetadata">
-                    <div class="_h3">
-                        <p id="gameMinPlayersId" class="_inlineBlock">min</p>
-                        <p class="_inlineBlock">-</p>
-                        <p id="gameMaxPlayersId" class="_inlineBlock">max</p>
-                    </div>
-                    Players<br>
-                </td>
-                <td class="_gameInfo _gameMetadata">
-                    <div class="_h3">
-                        <p id="gameMinPlaytime" class="_inlineBlock">min</p>
-                        <p class="_inlineBlock">-</p>
-                        <p id="gameMaxPlaytime" class="_inlineBlock">max</p>
-                    </div>
-                    Playtime<br>
-                </td>
-                <td id="gameMetadata4" class="_gameInfo _gameMetadata">
-                    <div class="_h3">
-                        <p id="gameMinAge" class="_inlineBlock">min</p>
-                    </div>
-                    Age<br>
-                </td>
-                <td></td>
-            </tr>
-            <tr>
-                <td colspan="5" class="_gameInfo">
-                    <div class="_h3">
-                        Creators
-                    </div>
-                    List...
-                </td>
-            </tr>
-        </table>
+    <!--Game List-->
+    <div id="loadingBar" class="_loader"></div>
+    <div id="topTenContainer">
+        
     </div>
 </body>
 
