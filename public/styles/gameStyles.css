@@ -16,6 +16,10 @@ button:hover {
     border: 1px solid dimgray;
 }
 
+h2 {
+    font-size: 1.5em;
+}
+
 ._loader {
   border: 16px solid lightgray;
   border-radius: 50%;
@@ -35,6 +39,13 @@ button:hover {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+#loadingText {
+    text-align: center;
+    font-size: 1em;
+    font-family: Tahoma;
+    margin: 10px;
 }
 
 ._column {

@@ -7,7 +7,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const topTenContainer = document.getElementById('topTenContainer');
         const loader = document.getElementById('loadingBar');
+        const loadingText = document.getElementById('loadingText');
         loader.remove();
+        loadingText.remove();
 
         if (data.length > 0) {
             for (let i = 0; i < data.length; i++) {
@@ -40,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 tr1.appendChild(titleColumn);
 
                 const gameTitle = document.createElement('a');
-                gameTitle.href = '/game';
+                gameTitle.href = '/game/' + data[i].id;
                 gameTitle.id = data[i].id;
                 gameTitle.textContent = data[i].name;
                 titleColumn.appendChild(gameTitle);
@@ -55,6 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 // Rating
                 const gameRating = document.createElement('div');
+                gameRating.classList.add('_h3');
                 gameRating.textContent = 'Rating: ' + data[i].score;
                 gameInfoColumn.appendChild(gameRating);
 

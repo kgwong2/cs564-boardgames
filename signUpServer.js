@@ -144,14 +144,14 @@ app.post('/review/delete/:userId/:boardgameId', (req, res) => {
     });
 });
 
-app.get('/game', (req, res) => {
-    res.render('game', { currentUserId: req.session.userId || null });
+app.get('/game/:id', (req, res) => {
+    res.render('game', { gameId: req.params.id, currentUserId: req.session.userId || null });
 });
 
-app.get('/boardGameInfo', async (req, res) => {
-    // TODO dynamically set id
-    let sql = 'SELECT * FROM boardgame b WHERE b.id = 13';
-    db.query(sql, (err, results) => {
+app.get('/boardGameInfo/:id', async (req, res) => {
+    const id = req.params.id;
+    let sql = 'SELECT * FROM boardgame b WHERE b.id = ?';
+    db.query(sql, [id], (err, results) => {
         if (err) throw err;
         res.json(results); // send data as JSON
     });

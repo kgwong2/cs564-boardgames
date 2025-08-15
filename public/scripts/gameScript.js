@@ -1,6 +1,10 @@
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        const response = await fetch('/boardGameInfo');
+        const gameCollection = document.getElementsByClassName('uniqueTest');
+        const gameDiv = gameCollection[0];
+        const gameId = gameDiv.id;
+        const routeString = "/boardGameInfo/" + gameId;
+        const response = await fetch(routeString);
         const data = await response.json();
         //console.log(data);
         //console.log(data[0]);
