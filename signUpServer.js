@@ -157,6 +157,21 @@ app.get('/boardGameInfo/:id', async (req, res) => {
     });
 });
 
+app.get('/contributedBy/:id', async (req, res) => {
+    console.log("reached");
+    const id = req.params.id;
+    let sql = `SELECT
+                    c.name,
+                    cb.isDesigner, cb.isArtist
+                FROM contributed_by cb
+                INNER JOIN creator c ON cb.creatorId = c.creatorId
+                WHERE cb.boardGameId = ?`;
+    db.query(sql, [id], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+})
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
