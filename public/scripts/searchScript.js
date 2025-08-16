@@ -125,8 +125,8 @@ searchButton.addEventListener('click', async () => {
         // Clear out zero state text
         document.getElementById('searchZeroStateId').innerText = '';
         // Clear out search result text
+        document.getElementById('searchContainerId').innerText = '';
         document.getElementById('_searchResultsCountId').innerText = '';
-
 
         // Query database
         let responseData;
@@ -261,14 +261,14 @@ searchButton.addEventListener('click', async () => {
         loadingText.remove();
 
         // If no results...
-        if (boardGameCount[0] === 0) {
+        if (boardGameCount[0].gameCount === 0) {
             document.getElementById('searchZeroStateId').innerText = 'No results returned.';
             return;
         }
 
         // Show count
         const searchResults = document.getElementById('_searchResultsCountId');
-        searchResults.innerText = 'Showing ' + boardGameCount[0] + ' results';
+        searchResults.innerText = 'Showing ' + boardGameCount[0].gameCount + ' results';
 
         const searchContainer = document.getElementById('searchContainerId');
 
