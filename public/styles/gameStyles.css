@@ -46,6 +46,27 @@ h2 {
     font-size: 1em;
     font-family: Tahoma;
     margin: 10px;
+    color: dimgray;
+}
+
+._slider {
+    width: 100%;
+}
+
+._sliderValue {
+    text-align: center;
+}
+
+._zeroState {
+    text-align: center;
+    margin-top: 10%;
+    color: dimgray;
+}
+
+._zeroState svg {
+    color: lightsteelblue;
+    min-width: 100px;
+    min-height: 100px;
 }
 
 ._column {

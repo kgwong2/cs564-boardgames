@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         const response = await fetch('/topTenGames');
         const data = await response.json();
-        console.log(data);
+        //console.log(data);
         //console.log(data[0]);
 
         const topTenContainer = document.getElementById('topTenContainer');

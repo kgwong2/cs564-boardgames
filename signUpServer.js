@@ -44,6 +44,20 @@ app.get('/search', (req, res) => {
     res.render('search', { currentUserId: req.session.userId || null });
 });
 
+app.get('/search/:contributor/:gameName/:playerCount/:playTime', (req, res) => {
+    
+    let basicSql = 'SELECT * FROM boardgame b';
+    
+    // if contributor
+    //INNER JOIN contributed_by cb ON b.id = cb.boardGameId
+    //INNER JOIN creator c ON cb.creatorId = c.creatorId
+
+    // if contributor
+    //WHERE c.name LIKE <contributor name>
+
+    // WHERE 
+});
+
 app.get('/user', (req, res) => {
     const username = req.session?.username;
 
