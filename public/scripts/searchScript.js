@@ -128,74 +128,133 @@ searchButton.addEventListener('click', async () => {
         document.getElementById('_searchResultsCountId').innerText = '';
 
 
+        // Query database
+        let responseData;
+        let boardGameData;
+        let responseCount;
+        let boardGameCount;
         let routeString;
 
         // All search criteria used
         if (gameTitleValue !== '' && playerCountCheckbox.checked && gameContributorValue !== '' && playtimeCheckbox.checked) {
             routeString = "all/" + gameTitleValue + "/" + gamePlayerCount + "/" + gamePlaytime + "/" + gameContributorValue;
+            responseData = await fetch("/searchGames/" + routeString);
+            boardGameData = await responseData.json();
+            responseCount = await fetch("/searchCount/" + routeString);
+            boardGameCount = await responseCount.json();
         }
         // Three search criteria: Game title, Player count, Contributor
         else if (gameTitleValue !== '' && playerCountCheckbox.checked && gameContributorValue !== '') {
             routeString = "three/titleCountContr/" + gameTitleValue + "/" + gamePlayerCount + "/" + gameContributorValue;
+            responseData = await fetch("/searchGames/" + routeString);
+            boardGameData = await responseData.json();
+            responseCount = await fetch("/searchCount/" + routeString);
+            boardGameCount = await responseCount.json();
         }
         // Three search criteria: Game title, Player count, Playtime
         else if (gameTitleValue !== '' && playerCountCheckbox.checked && playtimeCheckbox.checked) {
             routeString = "three/titleCountTime/" + gameTitleValue + "/" + gamePlayerCount + "/" + gamePlaytime;
+            responseData = await fetch("/searchGames/" + routeString);
+            boardGameData = await responseData.json();
+            responseCount = await fetch("/searchCount/" + routeString);
+            boardGameCount = await responseCount.json();
         }
         // Three search criteria: Game title, Contributor, Playtime
         else if (gameTitleValue !== '' && gameContributorValue !== '' && playtimeCheckbox.checked) {
             routeString = "three/titleTimeContr/" + gameTitleValue + "/" + gamePlaytime + "/" + gameContributorValue;
+            responseData = await fetch("/searchGames/" + routeString);
+            boardGameData = await responseData.json();
+            responseCount = await fetch("/searchCount/" + routeString);
+            boardGameCount = await responseCount.json();
         }
         // Three search criteria: Player count, Contributor, Playtime
         else if (playerCountCheckbox.checked && gameContributorValue !== '' && playtimeCheckbox.checked) {
             routeString = "three/countTimeContr/" + gamePlayerCount + "/" + gamePlaytime + "/" + gameContributorValue;
+            responseData = await fetch("/searchGames/" + routeString);
+            boardGameData = await responseData.json();
+            responseCount = await fetch("/searchCount/" + routeString);
+            boardGameCount = await responseCount.json();
         }   
         // Two search criteria: Game title, Player count
         else if (gameTitleValue !== '' && playerCountCheckbox.checked) {
             routeString = "two/titleCount/" + gameTitleValue + "/" + gamePlayerCount;
+            responseData = await fetch("/searchGames/" + routeString);
+            boardGameData = await responseData.json();
+            responseCount = await fetch("/searchCount/" + routeString);
+            boardGameCount = await responseCount.json();
         }
         // Two search criteria: Game title, Contributor
         else if (gameTitleValue !== '' && gameContributorValue !== '') {
             routeString = "two/titleContr/" + gameTitleValue + "/" + gameContributorValue;
+            responseData = await fetch("/searchGames/" + routeString);
+            boardGameData = await responseData.json();
+            responseCount = await fetch("/searchCount/" + routeString);
+            boardGameCount = await responseCount.json();
         }
         // Two search criteria: Game title, Playtime
         else if (gameTitleValue !== '' && playtimeCheckbox.checked) {
             routeString = "two/titleTime/" + gameTitleValue + "/" + gamePlaytime;
+            responseData = await fetch("/searchGames/" + routeString);
+            boardGameData = await responseData.json();
+            responseCount = await fetch("/searchCount/" + routeString);
+            boardGameCount = await responseCount.json();
         }
         // Two search criteria: Player count, Contributor
         else if (playerCountCheckbox.checked && gameContributorValue !== '') {
             routeString = "two/countContr/" + gamePlayerCount + "/" + gameContributorValue;
+            responseData = await fetch("/searchGames/" + routeString);
+            boardGameData = await responseData.json();
+            responseCount = await fetch("/searchCount/" + routeString);
+            boardGameCount = await responseCount.json();
         }
         // Two search criteria: Player count, Playtime
         else if (playerCountCheckbox.checked && playtimeCheckbox.checked) {
             routeString = "two/countTime/" + gamePlayerCount + "/" + gamePlaytime;
+            responseData = await fetch("/searchGames/" + routeString);
+            boardGameData = await responseData.json();
+            responseCount = await fetch("/searchCount/" + routeString);
+            boardGameCount = await responseCount.json();
         }
         // Two search criteria: Contributor, Playtime
         else if (gameContributorValue !== '' && playtimeCheckbox.checked) {
             routeString = "two/timeContr/" + gamePlaytime + "/" + gameContributorValue;
+            responseData = await fetch("/searchGames/" + routeString);
+            boardGameData = await responseData.json();
+            responseCount = await fetch("/searchCount/" + routeString);
+            boardGameCount = await responseCount.json();
         }
         // One search criterion: Game title
         else if (gameTitleValue !== '') {
             let routeString = "gameName/" + gameTitleValue;
+            responseData = await fetch("/searchGames/" + routeString);
+            boardGameData = await responseData.json();
+            responseCount = await fetch("/searchCount/" + routeString);
+            boardGameCount = await responseCount.json();
         }
         // One search criterion: Player count
         else if (playerCountCheckbox.checked) {
             let routeString = "playerCount/" + gamePlayerCount;
+            responseData = await fetch("/searchGames/" + routeString);
+            boardGameData = await responseData.json();
+            responseCount = await fetch("/searchCount/" + routeString);
+            boardGameCount = await responseCount.json();
         }
         // One search criterion: Contributor
         else if (gameContributorValue !== '') {
             let routeString = "contributor/" + gameContributorValue;
+            responseData = await fetch("/searchGames/" + routeString);
+            boardGameData = await responseData.json();
+            responseCount = await fetch("/searchCount/" + routeString);
+            boardGameCount = await responseCount.json();
         }
         // One search criterion: Playtime
         else if (playtimeCheckbox.checked) {
             routeString = "playtime/" + gamePlaytime;
+            responseData = await fetch("/searchGames/" + routeString);
+            boardGameData = await responseData.json();
+            responseCount = await fetch("/searchCount/" + routeString);
+            boardGameCount = await responseCount.json();
         }
-
-        // Query database
-        let responseData = await fetch("/searchGames/" + routeString);
-        let boardGameData = await responseData.json();
-        let responseCount = await fetch("/searchCount/" + routeString);
-        let boardGameCount = await responseCount.json();
 
         // Remove loading
         loadingBar.remove();
