@@ -272,3 +272,19 @@ h2 {
     cursor: pointer;
     font-size: 20px;
 }
+
+._reviewsTable {
+    width: 100%;
+    border-collapse: collapse; /* ensures borders are not doubled */
+}
+
+._reviewsTable th, 
+._reviewsTable td {
+    border: 1px solid #333; /* dark grid lines */
+    padding: 8px;
+    text-align: left;
+}
+
+._reviewsTable th {
+    background-color: #f2f2f2; /* optional header background */
+}

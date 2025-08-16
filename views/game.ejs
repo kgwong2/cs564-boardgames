@@ -88,40 +88,50 @@
         </table>
     </div>
 
-    <!--Reviews-->
-    <h2>Reviews</h2>
-    <button>Add Review</button><br>
-    <div class="_listedReview">
-        <table>
-            <tr>
-                <td rowspan="2">
-                    <div class="_ratingBox">
-                        rating
-                    </div>
-                </td>
-                <td>
-                    username
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    comment...
-                </td>
-            </tr>
-        </table>
-    </div>
+    <!-- Add Review Button -->
+    <button id="showReviewForm">Add Review</button>
 
-    <!--Testing-->
-        <table id="dataTable">
+    <!-- Hidden Review Form -->
+    <form id="addReviewForm" method="POST" action="/review/add/<%= game.id %>" style="display: none;">
+        <label for="rating">Rating:</label>
+        <input type="number" name="rating" min="1" max="10" required>
+
+        <label for="comment">Comment:</label>
+        <textarea name="comment" rows="4" required></textarea>
+
+        <button type="submit">Submit Review</button>
+    </form>
+
+    <!--Reviews-->
+        <table class="_reviewsTable">
             <thead>
                 <tr>
-                    <!-- Table headers will be populated by JavaScript -->
+                    <th>Username</th>
+                    <th>Rating</th>
+                    <th>Comment</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Table rows will be populated by JavaScript -->
+                <% if (reviews && reviews.length > 0) { %>
+                    <% reviews.forEach(review => { %>
+                        <tr>
+                            <td><%= review.username %></td>
+                            <td><%= review.rating %></td>
+                            <td><%= review.comment %></td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <p>No reviews yet for this game.</p>
+                <% } %>
             </tbody>
         </table>
 </body>
+
+<script>
+    document.getElementById("showReviewForm").addEventListener("click", function() {
+        const form = document.getElementById("addReviewForm");
+        form.style.display = form.style.display === "none" ? "block" : "none";
+    });
+</script>
 
 </html>

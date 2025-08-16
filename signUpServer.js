@@ -598,17 +598,12 @@ app.get('/searchCount/playtime/:playtime', (req, res) => {
     })
 });
 
-
-
 app.get('/user', (req, res) => {
     const username = req.session?.username;
 
     const userSql = 'SELECT userId, username FROM user WHERE username = ?'; 
     db.query(userSql, [username], (err, user) => {
         if (err) throw err;
-        if (user.length === 0) {
-            return res.status(404).send('User not found');
-        }
 
         const reviewsSql =
         `SELECT 
@@ -700,8 +695,53 @@ app.post('/review/delete/:userId/:boardgameId', (req, res) => {
     });
 });
 
+app.post('/review/add/:gameId', (req, res) => {
+    const { gameId } = req.params;
+    const { rating, comment } = req.body;
+    const userId = req.session.userId;
+
+    // Use INSERT ... ON DUPLICATE KEY UPDATE
+    //Updates existing review if the user already reviewed the game
+    const sql = `
+        INSERT INTO review (boardgameId, userId, rating, comment)
+        VALUES (?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE rating = VALUES(rating), comment = VALUES(comment)
+    `;
+
+    db.query(sql, [gameId, userId, rating, comment], (err, results) => {
+        if (err) {
+            console.error('Error adding/updating review:', err);
+            return res.status(500).send('Database error');
+        }
+        res.redirect(`/game/${gameId}`);
+    });
+});
+
 app.get('/game/:id', (req, res) => {
-    res.render('game', { gameId: req.params.id, currentUserId: req.session.userId || null });
+    const boardgameId = req.params.id;
+
+    const gameSql = "SELECT * FROM boardgame WHERE id = ?";
+    const reviewsSql = `
+        SELECT r.rating, r.comment, u.username
+        FROM review r
+        JOIN user u ON r.userId = u.userId
+        WHERE r.boardgameId = ?`;
+
+    db.query(gameSql, [boardgameId], (err, gameResults) => {
+        if (err) throw err;
+        const game = gameResults[0];
+
+        db.query(reviewsSql, [boardgameId], (err, reviewResults) => {
+            if (err) throw err;
+
+            res.render('game', {
+                gameId: boardgameId,
+                game: game,
+                reviews: reviewResults,
+                currentUserId: req.session.userId || null
+            });
+        });
+    });
 });
 
 app.get('/boardGameInfo/:id', async (req, res) => {
