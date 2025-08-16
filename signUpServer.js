@@ -44,19 +44,561 @@ app.get('/search', (req, res) => {
     res.render('search', { currentUserId: req.session.userId || null });
 });
 
-app.get('/search/:contributor/:gameName/:playerCount/:playTime', (req, res) => {
-    
-    let basicSql = 'SELECT * FROM boardgame b';
-    
-    // if contributor
-    //INNER JOIN contributed_by cb ON b.id = cb.boardGameId
-    //INNER JOIN creator c ON cb.creatorId = c.creatorId
+app.get('/searchGames/all/:gameName/:playerCount/:playtime/:contributor', (req, res) => {
+    const gameName = "%" + req.params.gameName + "%";
+    const playerCount = req.params.playerCount;
+    const playtime = req.params.playtime;
+    const contrName = "%" + req.params.contributor + "%";
 
-    // if contributor
-    //WHERE c.name LIKE <contributor name>
-
-    // WHERE 
+    let sql = `SELECT
+                    b.id,
+                    b.image,
+                    b.name,
+                    b.description
+                FROM boardgame b
+                INNER JOIN contributed_by cb ON b.id = cb.boardGameId
+                INNER JOIN creator c ON cb.creatorId = c.creatorId
+                WHERE b.name LIKE ?
+                AND b.minplayers <= ?
+                AND b.maxplayers >= ?
+                AND b.minplaytime <= ?
+                AND b.maxplaytime >= ?
+                AND c.name LIKE ?`;
+    db.query(sql, [gameName, playerCount, playerCount, playtime, playtime, contrName], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
 });
+
+app.get('/searchCount/all/:gameName/:playerCount/:playtime/:contributor', (req, res) => {
+    const gameName = "%" + req.params.gameName + "%";
+    const playerCount = req.params.playerCount;
+    const playtime = req.params.playtime;
+    const contrName = "%" + req.params.contributor + "%";
+
+    let sql = `SELECT COUNT(*) AS gameCount
+                FROM boardgame b
+                INNER JOIN contributed_by cb ON b.id = cb.boardGameId
+                INNER JOIN creator c ON cb.creatorId = c.creatorId
+                WHERE b.name LIKE ?
+                AND b.minplayers <= ?
+                AND b.maxplayers >= ?
+                AND b.minplaytime <= ?
+                AND b.maxplaytime >= ?
+                AND c.name LIKE ?`;
+    db.query(sql, [gameName, playerCount, playerCount, playtime, playtime, contrName], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchGames/three/titleCountContr/:gameName/:playerCount/:contributor', (req, res) => {
+    const gameName = "%" + req.params.gameName + "%";
+    const playerCount = req.params.playerCount;
+    const contrName = "%" + req.params.contributor + "%";
+
+    let sql = `SELECT
+                    b.id,
+                    b.image,
+                    b.name,
+                    b.description
+                FROM boardgame b
+                INNER JOIN contributed_by cb ON b.id = cb.boardGameId
+                INNER JOIN creator c ON cb.creatorId = c.creatorId
+                WHERE b.name LIKE ?
+                AND b.minplayers <= ?
+                AND b.maxplayers >= ?
+                AND c.name LIKE ?`;
+    db.query(sql, [gameName, playerCount, playerCount, contrName], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchCount/three/titleCountContr/:gameName/:playerCount/:contributor', (req, res) => {
+    const gameName = "%" + req.params.gameName + "%";
+    const playerCount = req.params.playerCount;
+    const contrName = "%" + req.params.contributor + "%";
+
+    let sql = `SELECT COUNT(*) AS gameCount
+                FROM boardgame b
+                INNER JOIN contributed_by cb ON b.id = cb.boardGameId
+                INNER JOIN creator c ON cb.creatorId = c.creatorId
+                WHERE b.name LIKE ?
+                AND b.minplayers <= ?
+                AND b.maxplayers >= ?
+                AND c.name LIKE ?`;
+    db.query(sql, [gameName, playerCount, playerCount, contrName], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchGames/three/titleCountTime/:gameName/:playerCount/:playtime', (req, res) => {
+    const gameName = "%" + req.params.gameName + "%";
+    const playerCount = req.params.playerCount;
+    const playtime = req.params.playtime;
+
+    let sql = `SELECT
+                    b.id,
+                    b.image,
+                    b.name,
+                    b.description
+                FROM boardgame b
+                WHERE b.name LIKE ?
+                AND b.minplayers <= ?
+                AND b.maxplayers >= ?
+                AND b.minplaytime <= ?
+                AND b.maxplaytime >= ?`;
+    db.query(sql, [gameName, playerCount, playerCount, playtime, playtime], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchCount/three/titleCountTime/:gameName/:playerCount/:playtime', (req, res) => {
+    const gameName = "%" + req.params.gameName + "%";
+    const playerCount = req.params.playerCount;
+    const playtime = req.params.playtime;
+
+    let sql = `SELECT COUNT(*) AS gameCount
+                FROM boardgame b
+                WHERE b.name LIKE ?
+                AND b.minplayers <= ?
+                AND b.maxplayers >= ?
+                AND b.minplaytime <= ?
+                AND b.maxplaytime >= ?`;
+    db.query(sql, [gameName, playerCount, playerCount, playtime, playtime], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchGames/three/titleTimeContr/:gameName/:playtime/:contributor', (req, res) => {
+    const gameName = "%" + req.params.gameName + "%";
+    const playtime = req.params.playtime;
+    const contrName = "%" + req.params.contributor + "%";
+
+    let sql = `SELECT
+                    b.id,
+                    b.image,
+                    b.name,
+                    b.description
+                FROM boardgame b
+                INNER JOIN contributed_by cb ON b.id = cb.boardGameId
+                INNER JOIN creator c ON cb.creatorId = c.creatorId
+                WHERE b.name LIKE ?
+                AND b.minplaytime <= ?
+                AND b.maxplaytime >= ?
+                AND c.name LIKE ?`;
+    db.query(sql, [gameName, playtime, playtime, contrName], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchCount/three/titleTimeContr/:gameName/:playtime/:contributor', (req, res) => {
+    const gameName = "%" + req.params.gameName + "%";
+    const playtime = req.params.playtime;
+    const contrName = "%" + req.params.contributor + "%";
+
+    let sql = `SELECT COUNT(*) AS gameCount
+                FROM boardgame b
+                INNER JOIN contributed_by cb ON b.id = cb.boardGameId
+                INNER JOIN creator c ON cb.creatorId = c.creatorId
+                WHERE b.name LIKE ?
+                AND b.minplaytime <= ?
+                AND b.maxplaytime >= ?
+                AND c.name LIKE ?`;
+    db.query(sql, [gameName, playtime, playtime, contrName], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchGames/three/countTimeContr/:playerCount/:playtime/:contributor', (req, res) => {
+    const playerCount = req.params.playerCount;
+    const playtime = req.params.playtime;
+    const contrName = "%" + req.params.contributor + "%";
+
+    let sql = `SELECT
+                    b.id,
+                    b.image,
+                    b.name,
+                    b.description
+                FROM boardgame b
+                INNER JOIN contributed_by cb ON b.id = cb.boardGameId
+                INNER JOIN creator c ON cb.creatorId = c.creatorId
+                WHERE b.minplayers <= ?
+                AND b.maxplayers >= ?
+                AND b.minplaytime <= ?
+                AND b.maxplaytime >= ?
+                AND c.name LIKE ?`;
+    db.query(sql, [playerCount, playerCount, playtime, playtime, contrName], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchCount/three/countTimeContr/:playerCount/:playtime/:contributor', (req, res) => {
+    const playerCount = req.params.playerCount;
+    const playtime = req.params.playtime;
+    const contrName = "%" + req.params.contributor + "%";
+
+    let sql = `SELECT COUNT(*) AS gameCount
+                FROM boardgame b
+                INNER JOIN contributed_by cb ON b.id = cb.boardGameId
+                INNER JOIN creator c ON cb.creatorId = c.creatorId
+                WHERE b.minplayers <= ?
+                AND b.maxplayers >= ?
+                AND b.minplaytime <= ?
+                AND b.maxplaytime >= ?
+                AND c.name LIKE ?`;
+    db.query(sql, [playerCount, playerCount, playtime, playtime, contrName], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchGames/two/titleCount/:gameName/:playerCount', (req, res) => {
+    const gameName = "%" + req.params.gameName + "%";
+    const playerCount = req.params.playerCount;
+
+    let sql = `SELECT
+                    b.id,
+                    b.image,
+                    b.name,
+                    b.description
+                FROM boardgame b
+                WHERE b.name LIKE ?
+                AND b.minplayers <= ?
+                AND b.maxplayers >= ?`;
+    db.query(sql, [gameName, playerCount, playerCount], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchCount/two/titleCount/:gameName/:playerCount', (req, res) => {
+    const gameName = "%" + req.params.gameName + "%";
+    const playerCount = req.params.playerCount;
+
+    let sql = `SELECT COUNT(*) AS gameCount
+                FROM boardgame b
+                WHERE b.name LIKE ?
+                AND b.minplayers <= ?
+                AND b.maxplayers >= ?`;
+    db.query(sql, [gameName, playerCount, playerCount], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchGames/two/titleContr/:gameName/:contributor', (req, res) => {
+    const gameName = "%" + req.params.gameName + "%";
+    const contrName = "%" + req.params.contributor + "%";
+
+    let sql = `SELECT
+                    b.id,
+                    b.image,
+                    b.name,
+                    b.description
+                FROM boardgame b
+                INNER JOIN contributed_by cb ON b.id = cb.boardGameId
+                INNER JOIN creator c ON cb.creatorId = c.creatorId
+                WHERE b.name LIKE ?
+                AND c.name LIKE ?`;
+    db.query(sql, [gameName, contrName], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchCount/two/titleContr/:gameName/:contributor', (req, res) => {
+    const gameName = "%" + req.params.gameName + "%";
+    const contrName = "%" + req.params.contributor + "%";
+
+    let sql = `SELECT COUNT(*) AS gameCount
+                FROM boardgame b
+                INNER JOIN contributed_by cb ON b.id = cb.boardGameId
+                INNER JOIN creator c ON cb.creatorId = c.creatorId
+                WHERE b.name LIKE ?
+                AND c.name LIKE ?`;
+    db.query(sql, [gameName, contrName], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchGames/two/titleTime/:gameName/:playtime', (req, res) => {
+    const gameName = "%" + req.params.gameName + "%";
+    const playtime = req.params.playtime;
+
+    let sql = `SELECT
+                    b.id,
+                    b.image,
+                    b.name,
+                    b.description
+                FROM boardgame b
+                WHERE b.name LIKE ?
+                AND b.minplaytime <= ?
+                AND b.maxplaytime >= ?`;
+    db.query(sql, [gameName, playtime, playtime], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchCount/two/titleTime/:gameName/:playtime', (req, res) => {
+    const gameName = "%" + req.params.gameName + "%";
+    const playtime = req.params.playtime;
+
+    let sql = `SELECT COUNT(*) AS gameCount
+                FROM boardgame b
+                INNER JOIN contributed_by cb ON b.id = cb.boardGameId
+                INNER JOIN creator c ON cb.creatorId = c.creatorId
+                WHERE b.name LIKE ?
+                AND b.minplaytime <= ?
+                AND b.maxplaytime >= ?`;
+    db.query(sql, [gameName, playtime, playtime], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchGames/two/countContr/:playerCount/:contributor', (req, res) => {
+    const playerCount = req.params.playerCount;
+    const contrName = "%" + req.params.contributor + "%";
+
+    let sql = `SELECT
+                    b.id,
+                    b.image,
+                    b.name,
+                    b.description
+                FROM boardgame b
+                INNER JOIN contributed_by cb ON b.id = cb.boardGameId
+                INNER JOIN creator c ON cb.creatorId = c.creatorId
+                WHERE b.minplayers <= ?
+                AND b.maxplayers >= ?
+                AND c.name LIKE ?`;
+    db.query(sql, [playerCount, playerCount, contrName], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchCount/two/countContr/:playerCount/:contributor', (req, res) => {
+    const playerCount = req.params.playerCount;
+    const contrName = "%" + req.params.contributor + "%";
+
+    let sql = `SELECT COUNT(*) AS gameCount
+                FROM boardgame b
+                INNER JOIN contributed_by cb ON b.id = cb.boardGameId
+                INNER JOIN creator c ON cb.creatorId = c.creatorId
+                WHERE b.minplayers <= ?
+                AND b.maxplayers >= ?
+                AND c.name LIKE ?`;
+    db.query(sql, [playerCount, playerCount, contrName], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchGames/two/countTime/:playerCount/:playtime', (req, res) => {
+    const playerCount = req.params.playerCount;
+    const playtime = req.params.playtime;
+
+    let sql = `SELECT
+                    b.id,
+                    b.image,
+                    b.name,
+                    b.description
+                FROM boardgame b
+                WHERE b.minplayers <= ?
+                AND b.maxplayers >= ?
+                AND b.minplaytime <= ?
+                AND b.maxplaytime >= ?`;
+    db.query(sql, [playerCount, playerCount, playtime, playtime], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchCount/two/countTime/:playerCount/:playtime', (req, res) => {
+    const playerCount = req.params.playerCount;
+    const playtime = req.params.playtime;
+
+    let sql = `SELECT COUNT(*) AS gameCount
+                FROM boardgame b
+                WHERE b.minplayers <= ?
+                AND b.maxplayers >= ?
+                AND b.minplaytime <= ?
+                AND b.maxplaytime >= ?`;
+    db.query(sql, [playerCount, playerCount, playtime, playtime], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchGames/two/timeContr/:playtime/:contributor', (req, res) => {
+    const playtime = req.params.playtime;
+    const contrName = "%" + req.params.contributor + "%";
+
+    let sql = `SELECT
+                    b.id,
+                    b.image,
+                    b.name,
+                    b.description
+                FROM boardgame b
+                INNER JOIN contributed_by cb ON b.id = cb.boardGameId
+                INNER JOIN creator c ON cb.creatorId = c.creatorId
+                WHERE b.minplaytime <= ?
+                AND b.maxplaytime >= ?
+                AND c.name LIKE ?`;
+    db.query(sql, [playtime, playtime, contrName], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchCount/two/timeContr/:playtime/:contributor', (req, res) => {
+    const playtime = req.params.playtime;
+    const contrName = "%" + req.params.contributor + "%";
+
+    let sql = `SELECT COUNT(*) AS gameCount
+                FROM boardgame b
+                INNER JOIN contributed_by cb ON b.id = cb.boardGameId
+                INNER JOIN creator c ON cb.creatorId = c.creatorId
+                WHERE b.minplaytime <= ?
+                AND b.maxplaytime >= ?
+                AND c.name LIKE ?`;
+    db.query(sql, [playtime, playtime, contrName], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchGames/gameName/:gameName', (req, res) => {
+    const gameName = "%" + req.params.gameName + "%";
+
+    let sql = `SELECT
+                    b.id,
+                    b.image,
+                    b.name,
+                    b.description
+                FROM boardgame b
+                WHERE b.name LIKE ?`;
+    db.query(sql, [gameName], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchCount/gameName/:gameName', (req, res) => {
+    const gameName = "%" + req.params.gameName + "%";
+
+    let sql = `SELECT COUNT(*) AS gameCount
+                FROM boardgame b
+                WHERE b.name LIKE ?`;
+    db.query(sql, [gameName], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchGames/playerCount/:playerCount', (req, res) => {
+    const playerCount = req.params.playerCount;
+
+    let sql = `SELECT
+                    b.id,
+                    b.image,
+                    b.name,
+                    b.description
+                FROM boardgame b
+                WHERE b.minplayers <= ?
+                AND b.maxplayers >= ?`;
+    db.query(sql, [playerCount, playerCount], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchCount/playerCount/:playerCount', (req, res) => {
+    const playerCount = req.params.playerCount;
+
+    let sql = `SELECT COUNT(*) AS gameCount
+                FROM boardgame b
+                WHERE b.minplayers <= ?
+                AND b.maxplayers >= ?`;
+    db.query(sql, [playerCount, playerCount], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchGames/contributor/:contributor', (req, res) => {
+    const contrName = "%" + req.params.contributor + "%";
+
+    let sql = `SELECT
+                    b.id,
+                    b.image,
+                    b.name,
+                    b.description
+                FROM boardgame b
+                INNER JOIN contributed_by cb ON b.id = cb.boardGameId
+                INNER JOIN creator c ON cb.creatorId = c.creatorId
+                WHERE c.name LIKE ?`;
+    db.query(sql, [contrName], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchCount/contributor/:contributor', (req, res) => {
+    const contrName = "%" + req.params.contributor + "%";
+
+    let sql = `SELECT COUNT(*) AS gameCount
+                FROM boardgame b
+                INNER JOIN contributed_by cb ON b.id = cb.boardGameId
+                INNER JOIN creator c ON cb.creatorId = c.creatorId
+                WHERE c.name LIKE ?`;
+    db.query(sql, [contrName], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchGames/playtime/:playtime', (req, res) => {
+    const playtime = req.params.playtime;
+
+    let sql = `SELECT
+                    b.id,
+                    b.image,
+                    b.name,
+                    b.description
+                FROM boardgame b
+                WHERE b.minplaytime <= ?
+                AND b.maxplaytime >= ?`;
+    db.query(sql, [playtime, playtime], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+app.get('/searchCount/playtime/:playtime', (req, res) => {
+    const playtime = req.params.playtime;
+
+    let sql = `SELECT COUNT(*) AS gameCount
+                FROM boardgame b
+                WHERE b.minplaytime <= ?
+                AND b.maxplaytime >= ?`;
+    db.query(sql, [playtime, playtime], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    })
+});
+
+
 
 app.get('/user', (req, res) => {
     const username = req.session?.username;
