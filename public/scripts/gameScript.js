@@ -51,7 +51,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         minAge.innerText = data[0].minage;
 
     } catch (error) {
-        console.error('Error loading data:', error);
+        console.error('Error loading game data:', error);
+        // Display an error message to the user
+    }
+
+    try {
+        const gameCollection = document.getElementsByClassName('uniqueTest');
+        const gameDiv = gameCollection[0];
+        const gameId = gameDiv.id;
+        const routeString = "/contributedBy/" + gameId;
+        const response = await fetch(routeString);
+        const data = await response.json();
+        
+        const creatorList = document.getElementById('creatorList');
+        for (const creator of data) {
+            const creatorName = creator.name;
+            const isDesigner = creator.isDesigner ? "Yes" : "No";
+            const isArtist = creator.isArtist ? "Yes" : "No";
+            creatorList.innerHTML += `<tr><td>${creatorName}</td><td>${isDesigner}</td><td>${isArtist}</td></tr>`;
+        }
+    } catch (error) {
+        console.error('Error loading creator data:', error);
         // Display an error message to the user
     }
 });
