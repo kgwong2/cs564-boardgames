@@ -6,7 +6,7 @@ const session = require('express-session');
 const mysql = require('mysql2');
 
 const db = mysql.createPool({
-    host: '147.219.74.241',
+    host: 'localhost',
     port: 3306,
     database: 'boardgames',
     user: 'boardgame',
