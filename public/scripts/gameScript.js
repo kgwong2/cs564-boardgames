@@ -6,9 +6,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const routeString = "/boardGameInfo/" + gameId;
         const response = await fetch(routeString);
         const data = await response.json();
-        //console.log(data);
-        //console.log(data[0]);
 
+        // Get elements to populate
         const gameTitle = document.getElementById('gameTitleId');
         const gameImage = document.getElementById('gameImageId');
         const gamePublishYear = document.getElementById('gamePublishYearId');
@@ -20,8 +19,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const maxPlaytime = document.getElementById('gameMaxPlaytime');
         const minAge = document.getElementById('gameMinAge');
 
+        // Image transformations
         let imgUrl = data[0].image;
         let htmlImg = "<img src='" + imgUrl + "' width='300'>";
+
+        // Description transformations
         let curDesc = data[0].description;
         let newDesc = curDesc
             .replaceAll("&#10;", "\n")

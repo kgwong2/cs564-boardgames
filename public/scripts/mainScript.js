@@ -2,15 +2,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         const response = await fetch('/topTenGames');
         const data = await response.json();
-        //console.log(data);
-        //console.log(data[0]);
 
+        // Get document elements
         const topTenContainer = document.getElementById('topTenContainer');
         const loader = document.getElementById('loadingBar');
         const loadingText = document.getElementById('loadingText');
+
+        // Remove loader placeholder
         loader.remove();
         loadingText.remove();
 
+        // Populate
         if (data.length > 0) {
             for (let i = 0; i < data.length; i++) {
                 // Create container
